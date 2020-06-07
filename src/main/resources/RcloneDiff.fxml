@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="700.0" prefWidth="853.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.kaiwinter.rclonediff.DiffController">
+<AnchorPane prefHeight="704.0" prefWidth="1469.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.kaiwinter.rclonediff.DiffController">
   <!-- TODO Add Nodes -->
   <children>
       <VBox layoutX="20.0" layoutY="15.0" prefHeight="683.0" prefWidth="829.0" spacing="5.0" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="10.0">
@@ -20,9 +20,9 @@
             <children>
               <Label text="Local Path" GridPane.columnIndex="0" GridPane.rowIndex="0" />
               <Button id="fileChoose" alignment="CENTER" cancelButton="false" contentDisplay="LEFT" defaultButton="false" disable="true" mnemonicParsing="false" text="Choose" GridPane.columnIndex="3" GridPane.rowIndex="0" />
-              <TextField id="filepath" fx:id="inputFilepath" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="0" />
+              <TextField id="filepath" fx:id="localPath" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="0" />
               <Label minWidth="-Infinity" text="Remote Path" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-              <TextField id="filepath" fx:id="outputFilepath" editable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+              <TextField id="filepath" fx:id="remotePath" editable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
               <Button defaultButton="false" disable="true" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefWidth="-1.0" text="Choose" wrapText="false" GridPane.columnIndex="3" GridPane.rowIndex="1">
                 <GridPane.margin>
                   <Insets />
@@ -51,12 +51,16 @@
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                </columnConstraints>
                <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <ListView fx:id="localOnly" prefHeight="200.0" prefWidth="200.0" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
-                  <ListView fx:id="diffs" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
-                  <ListView fx:id="remoteOnly" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                  <ListView fx:id="localOnly" prefHeight="200.0" prefWidth="200.0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+                  <ListView fx:id="diffs" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+                  <ListView fx:id="remoteOnly" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+                  <Label text="Local only" />
+                  <Label text="Different content" GridPane.columnIndex="1" />
+                  <Label text="Remote only" GridPane.columnIndex="2" />
                </children>
             </GridPane>
          </children>

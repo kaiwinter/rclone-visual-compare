@@ -10,8 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.kaiwinter.rclonediff.model.DirectoryEntry;
-import com.github.kaiwinter.rclonediff.model.NotInLocal;
-import com.github.kaiwinter.rclonediff.model.NotInRemote;
+import com.github.kaiwinter.rclonediff.model.LocalOnlyFile;
+import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,7 +22,7 @@ import lombok.Getter;
 public class RcloneWrapper {
 
   public static void main(String[] args) throws InterruptedException, IOException {
-    new RcloneWrapper().check();
+    new RcloneWrapper().check("c:/temp/rclone-vs/2020/", "DropboxTineCrypt:/2020/");
     // lsjson();
 
   }
@@ -60,13 +60,13 @@ public class RcloneWrapper {
   private List<String> sizeDiffer;
 
   @Getter
-  private List<NotInLocal> notInLocal;
+  private List<RemoteOnlyFile> notInLocal;
 
   @Getter
-  private List<NotInRemote> notInRemote;
+  private List<LocalOnlyFile> notInRemote;
 
-  public void check() throws IOException, InterruptedException {
-    Process process = Runtime.getRuntime().exec("rclone check c:/temp/rclone-vs/2020/2020-04 DropboxTineCrypt:/2020/2020-04");
+  public void check(String localPath, String remotePath) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec("rclone check " + localPath + " " + remotePath);
 
     InputStreamReader is = new InputStreamReader(process.getErrorStream());
     BufferedReader reader = new BufferedReader(is);
@@ -78,13 +78,14 @@ public class RcloneWrapper {
     String line;
     while ((line = reader.readLine()) != null) {
       Matcher matcher;
+      System.out.println(line);
 
       if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
         sizeDiffer.add(matcher.group(1));
       } else if ((matcher = NOT_IN_LOCAL.matcher(line)).matches()) {
-        notInLocal.add(new NotInLocal(matcher.group(1), matcher.group(2)));
+        notInLocal.add(new RemoteOnlyFile(matcher.group(1), matcher.group(2), remotePath));
       } else if ((matcher = NOT_IN_REMOTE.matcher(line)).matches()) {
-        notInRemote.add(new NotInRemote(matcher.group(1), matcher.group(2)));
+        notInRemote.add(new LocalOnlyFile(matcher.group(1), localPath, matcher.group(2)));
       } else if ((matcher = NUMBER_OF_DIFFERENCES.matcher(line)).matches()) {
         long expectedEntries = Long.valueOf(matcher.group(1));
         long actualEntries = sizeDiffer.size() + notInLocal.size() + notInRemote.size();
