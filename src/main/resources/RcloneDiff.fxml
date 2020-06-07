@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="700.0" prefWidth="853.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.kaiwinter.rclonediff.DiffController">
+  <!-- TODO Add Nodes -->
+  <children>
+      <VBox layoutX="20.0" layoutY="15.0" prefHeight="683.0" prefWidth="829.0" spacing="5.0" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="10.0">
+         <children>
+          <GridPane alignment="TOP_LEFT" gridLinesVisible="false" hgap="5.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" vgap="5.0">
+            <children>
+              <Label text="Local Path" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+              <Button id="fileChoose" alignment="CENTER" cancelButton="false" contentDisplay="LEFT" defaultButton="false" disable="true" mnemonicParsing="false" text="Choose" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+              <TextField id="filepath" fx:id="inputFilepath" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="0" />
+              <Label minWidth="-Infinity" text="Remote Path" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+              <TextField id="filepath" fx:id="outputFilepath" editable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+              <Button defaultButton="false" disable="true" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefWidth="-1.0" text="Choose" wrapText="false" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                <GridPane.margin>
+                  <Insets />
+                </GridPane.margin>
+              </Button>
+            </children>
+            <columnConstraints>
+              <ColumnConstraints hgrow="NEVER" minWidth="0.0" />
+              <ColumnConstraints hgrow="ALWAYS" maxWidth="600.0" minWidth="-Infinity" prefWidth="326.0" />
+              <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="0.0" minWidth="-Infinity" prefWidth="0.0" />
+              <ColumnConstraints fillWidth="false" hgrow="NEVER" minWidth="-Infinity" />
+              <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" />
+            </columnConstraints>
+            <padding>
+              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+            <rowConstraints>
+              <RowConstraints fillHeight="false" maxHeight="22.0" minHeight="-Infinity" prefHeight="22.0" vgrow="NEVER" />
+              <RowConstraints fillHeight="false" maxHeight="22.0" minHeight="-Infinity" prefHeight="22.0" vgrow="NEVER" />
+            </rowConstraints>
+          </GridPane>
+            <GridPane VBox.vgrow="ALWAYS">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <ListView fx:id="localOnly" prefHeight="200.0" prefWidth="200.0" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                  <ListView fx:id="diffs" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                  <ListView fx:id="remoteOnly" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+               </children>
+            </GridPane>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </VBox>
+  </children>
+  <padding>
+    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+  </padding>
+</AnchorPane>
