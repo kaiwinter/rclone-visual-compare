@@ -15,10 +15,10 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -39,12 +39,15 @@ public class DiffController implements Initializable {
   @FXML
   private TextField remotePath;
 
+  @Getter
   @FXML
   private ListView<LocalOnlyFile> localOnly;
 
+  @Getter
   @FXML
   private ListView<String> diffs;
 
+  @Getter
   @FXML
   private ListView<RemoteOnlyFile> remoteOnly;
 
@@ -63,7 +66,21 @@ public class DiffController implements Initializable {
   @FXML
   private Label remoteOnlyLabel;
 
+  @Getter
+  @FXML
+  private Button localChooseButton;
+
+  @Getter
+  @FXML
+  private Button remoteChooseButton;
+
+  @Getter
+  @FXML
+  private Button diffButton;
+
   private Path tempDirectory;
+
+  private RcloneService rcloneService;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -95,6 +112,14 @@ public class DiffController implements Initializable {
           remoteOnlyImage.setImage(null);
           return;
         }
+
+        rcloneService.setRunnable(() -> {
+          copy_internal(newValue);
+        });
+        rcloneService.restart();
+      }
+
+      private void copy_internal(RemoteOnlyFile newValue) {
         // TODO: better filetype filter
         if (!newValue.getFile().endsWith(".jpg")) {
           // TODO: show placeholder
@@ -129,15 +154,10 @@ public class DiffController implements Initializable {
 
   @FXML
   public void diff(ActionEvent event) {
-    Task<Void> task = new Task<>() {
-      @Override
-      public Void call() {
-        diff_internal();
-        return null;
-      }
-    };
-    task.setOnSucceeded(taskFinishEvent -> System.out.println(taskFinishEvent));
-    new Thread(task).start();
+    rcloneService.setRunnable(() -> {
+      diff_internal();
+    });
+    rcloneService.restart();
   }
 
   private void diff_internal() {
@@ -164,6 +184,10 @@ public class DiffController implements Initializable {
       tempDirectory = Files.createTempDirectory("rclone-diff");
     }
     return tempDirectory;
+  }
+
+  public void setService(RcloneService rcloneService) {
+    this.rcloneService = rcloneService;
   }
 
 }

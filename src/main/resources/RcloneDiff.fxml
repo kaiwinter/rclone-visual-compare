@@ -20,16 +20,16 @@
           <GridPane alignment="TOP_LEFT" gridLinesVisible="false" hgap="5.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" vgap="5.0">
             <children>
               <Label text="Local Path" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-              <Button id="fileChoose" alignment="CENTER" cancelButton="false" contentDisplay="LEFT" defaultButton="false" disable="true" mnemonicParsing="false" text="Choose" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+              <Button id="fileChoose" fx:id="localChooseButton" alignment="CENTER" cancelButton="false" contentDisplay="LEFT" defaultButton="false" disable="true" mnemonicParsing="false" text="Choose" GridPane.columnIndex="3" GridPane.rowIndex="0" />
               <TextField id="filepath" fx:id="localPath" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="0" />
               <Label minWidth="-Infinity" text="Remote Path" GridPane.columnIndex="0" GridPane.rowIndex="1" />
               <TextField id="filepath" fx:id="remotePath" editable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-              <Button defaultButton="false" disable="true" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefWidth="-1.0" text="Choose" wrapText="false" GridPane.columnIndex="3" GridPane.rowIndex="1">
+              <Button fx:id="remoteChooseButton" defaultButton="false" disable="true" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefWidth="-1.0" text="Choose" wrapText="false" GridPane.columnIndex="3" GridPane.rowIndex="1">
                 <GridPane.margin>
                   <Insets />
                 </GridPane.margin>
               </Button>
-                  <Button mnemonicParsing="false" onAction="#diff" text="Diff" GridPane.columnIndex="5" GridPane.rowSpan="2" />
+                  <Button fx:id="diffButton" mnemonicParsing="false" onAction="#diff" text="Diff" GridPane.columnIndex="5" GridPane.rowSpan="2" />
             </children>
             <columnConstraints>
               <ColumnConstraints hgrow="NEVER" minWidth="0.0" />
