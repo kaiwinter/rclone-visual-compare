@@ -1,4 +1,4 @@
-package com.github.kaiwinter.rclonediff;
+package com.github.kaiwinter.rclonediff.core;
 
 import java.io.IOException;
 import java.net.URL;
@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 
 import com.github.kaiwinter.rclonediff.model.LocalOnlyFile;
 import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
-import com.github.kaiwinter.rclonediff.model.SyncFileStringConverter;
+import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

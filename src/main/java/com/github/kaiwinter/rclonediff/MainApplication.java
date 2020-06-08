@@ -1,8 +1,8 @@
-package com.github.kaiwinter.rclonediff.application;
+package com.github.kaiwinter.rclonediff;
 
 import java.io.IOException;
 
-import com.github.kaiwinter.rclonediff.DiffController;
+import com.github.kaiwinter.rclonediff.core.DiffController;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

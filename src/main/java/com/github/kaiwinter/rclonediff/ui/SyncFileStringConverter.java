@@ -1,4 +1,6 @@
-package com.github.kaiwinter.rclonediff.model;
+package com.github.kaiwinter.rclonediff.ui;
+
+import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.util.StringConverter;
 
