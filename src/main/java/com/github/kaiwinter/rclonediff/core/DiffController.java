@@ -11,7 +11,6 @@ import com.github.kaiwinter.rclonediff.model.LocalOnlyFile;
 import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -161,22 +160,29 @@ public class DiffController implements Initializable {
   }
 
   private void diff_internal() {
-    RcloneWrapper main = new RcloneWrapper();
-    try {
-      main.check(localPath.getText(), remotePath.getText());
-      Platform.runLater(() -> {
-        localOnly.setItems(FXCollections.observableArrayList(main.getNotInRemote()));
-        diffs.setItems(FXCollections.observableArrayList(main.getSizeDiffer()));
-        remoteOnly.setItems(FXCollections.observableArrayList(main.getNotInLocal()));
+    RcloneCheckService rcloneCheckService = new RcloneCheckService(localPath.getText(), remotePath.getText());
 
-        localOnlyLabel.setText("Local only (" + main.getNotInRemote().size() + ")");
-        diffsLabel.setText("Different content (" + main.getSizeDiffer().size() + ")");
-        remoteOnlyLabel.setText("Remote only (" + main.getNotInLocal().size() + ")");
-      });
+    // scene.getRoot().cursorProperty().bind(Bindings.when(rcloneCheckService.runningProperty()).then(Cursor.WAIT).otherwise(Cursor.DEFAULT));
+    localPath.disableProperty().bind(rcloneCheckService.runningProperty());
+    remotePath.disableProperty().bind(rcloneCheckService.runningProperty());
+    localChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
+    remoteChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
+    diffButton.disableProperty().bind(rcloneCheckService.runningProperty());
+    localOnly.disableProperty().bind(rcloneCheckService.runningProperty());
+    remoteOnly.disableProperty().bind(rcloneCheckService.runningProperty());
+    diffs.disableProperty().bind(rcloneCheckService.runningProperty());
 
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    rcloneCheckService.setOnSucceeded(event -> {
+      localOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInRemote()));
+      diffs.setItems(FXCollections.observableArrayList(rcloneCheckService.getSizeDiffer()));
+      remoteOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInLocal()));
+
+      localOnlyLabel.setText("Local only (" + rcloneCheckService.getNotInRemote().size() + ")");
+      diffsLabel.setText("Different content (" + rcloneCheckService.getSizeDiffer().size() + ")");
+      remoteOnlyLabel.setText("Remote only (" + rcloneCheckService.getNotInLocal().size() + ")");
+    });
+    rcloneCheckService.start();
+
   }
 
   private Path getTempDirectoryLazy() throws IOException {
