@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import com.github.kaiwinter.rclonediff.model.LocalOnlyFile;
 import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
+import com.github.kaiwinter.rclonediff.model.SyncFileStringConverter;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -18,9 +19,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.util.StringConverter;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DiffController implements Initializable {
 
   @Getter
@@ -48,47 +50,26 @@ public class DiffController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    localOnly.setCellFactory(TextFieldListCell.forListView(new StringConverter<LocalOnlyFile>() {
-
-      @Override
-      public String toString(LocalOnlyFile object) {
-        return object.getFile() + ": " + object.getLocalPath() + " -> " + object.getRemotePath();
-      }
-
-      @Override
-      public LocalOnlyFile fromString(String string) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-    }));
+    localOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter<LocalOnlyFile>()));
+    remoteOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter<RemoteOnlyFile>()));
 
     localOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<LocalOnlyFile>() {
 
       @Override
       public void changed(ObservableValue<? extends LocalOnlyFile> observable, LocalOnlyFile oldValue, LocalOnlyFile newValue) {
-        System.out.println("Selected item: " + newValue);
+        if (newValue == null) {
+          localOnlyImage.setImage(null);
+          return;
+        }
         Image image = new Image("file:///" + newValue.getLocalPath() + newValue.getFile());
         boolean error = image.isError();
         if (error) {
-          System.out.println("Fehler beim Laden des Bildes");
+          log.error("Fehler beim Laden des Bildes");
         }
         localOnlyImage.setImage(image);
       }
     });
 
-    remoteOnly.setCellFactory(TextFieldListCell.forListView(new StringConverter<RemoteOnlyFile>() {
-
-      @Override
-      public String toString(RemoteOnlyFile object) {
-        return object.getFile() + ": " + object.getRemotePath() + " -> " + object.getLocalPath();
-      }
-
-      @Override
-      public RemoteOnlyFile fromString(String string) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-    }));
   }
 
   @FXML
