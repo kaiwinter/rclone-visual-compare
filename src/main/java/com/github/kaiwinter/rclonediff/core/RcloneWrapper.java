@@ -31,11 +31,12 @@ public class RcloneWrapper {
   @Getter
   private List<LocalOnlyFile> notInRemote = new ArrayList<>();
 
-  public void check(String localPath, String remotePath) throws IOException, InterruptedException {
-    Process process = Runtime.getRuntime().exec("rclone check " + localPath + " " + remotePath);
+  public void check(String localPath, String remotePath) throws IOException {
+    String command = "rclone check " + localPath + " " + remotePath;
+    log.info("Check command: {}", command);
 
-    InputStreamReader is = new InputStreamReader(process.getErrorStream());
-    BufferedReader reader = new BufferedReader(is);
+    Process process = Runtime.getRuntime().exec(command);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
     String line;
     while ((line = reader.readLine()) != null) {
@@ -57,8 +58,30 @@ public class RcloneWrapper {
       }
     }
 
-    process.waitFor();
+    wait(process);
     log.debug("check value code {}", process.exitValue());
   }
 
+  public static void copy(String file, String fromPath, String toPath) throws IOException {
+    String command = "rclone copy " + fromPath + "/" + file + " " + toPath;
+    log.info("Copy command: {}", command);
+
+    Process process = Runtime.getRuntime().exec(command);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+    String line;
+    while ((line = reader.readLine()) != null) {
+      log.error(line);
+    }
+    wait(process);
+    log.info("check value code {}", process.exitValue());
+  }
+
+  private static void wait(Process process) {
+    try {
+      process.waitFor();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

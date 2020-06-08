@@ -62,9 +62,9 @@
                   <ListView fx:id="localOnly" prefHeight="200.0" prefWidth="200.0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
                   <ListView fx:id="diffs" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
                   <ListView fx:id="remoteOnly" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
-                  <Label text="Local only" />
-                  <Label text="Different content" GridPane.columnIndex="1" />
-                  <Label text="Remote only" GridPane.columnIndex="2" />
+                  <Label fx:id="localOnlyLabel" text="Local only" />
+                  <Label fx:id="diffsLabel" text="Different content" GridPane.columnIndex="1" />
+                  <Label fx:id="remoteOnlyLabel" text="Remote only" GridPane.columnIndex="2" />
                   <ImageView fx:id="localOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2" />
                   <ImageView fx:id="remoteOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                </children>
