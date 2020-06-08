@@ -7,19 +7,27 @@ import java.util.ResourceBundle;
 import com.github.kaiwinter.rclonediff.model.LocalOnlyFile;
 import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.StringConverter;
+import lombok.Getter;
 
 public class DiffController implements Initializable {
 
+  @Getter
   @FXML
   private TextField localPath;
 
+  @Getter
   @FXML
   private TextField remotePath;
 
@@ -32,8 +40,11 @@ public class DiffController implements Initializable {
   @FXML
   private ListView<RemoteOnlyFile> remoteOnly;
 
-  String localPathS = "c:/temp/rclone-vs/2020/";
-  String remotePathS = "DropboxTineCrypt:/2020/";
+  @FXML
+  private ImageView localOnlyImage;
+
+  @FXML
+  private ImageView remoteOnlyImage;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -51,6 +62,20 @@ public class DiffController implements Initializable {
       }
     }));
 
+    localOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<LocalOnlyFile>() {
+
+      @Override
+      public void changed(ObservableValue<? extends LocalOnlyFile> observable, LocalOnlyFile oldValue, LocalOnlyFile newValue) {
+        System.out.println("Selected item: " + newValue);
+        Image image = new Image("file:///" + newValue.getLocalPath() + newValue.getFile());
+        boolean error = image.isError();
+        if (error) {
+          System.out.println("Fehler beim Laden des Bildes");
+        }
+        localOnlyImage.setImage(image);
+      }
+    });
+
     remoteOnly.setCellFactory(TextFieldListCell.forListView(new StringConverter<RemoteOnlyFile>() {
 
       @Override
@@ -64,10 +89,13 @@ public class DiffController implements Initializable {
         return null;
       }
     }));
+  }
 
+  @FXML
+  public void diff(ActionEvent event) {
     RcloneWrapper main = new RcloneWrapper();
     try {
-      main.check(localPathS, remotePathS);
+      main.check(localPath.getText(), remotePath.getText());
       localOnly.setItems(FXCollections.observableArrayList(main.getNotInRemote()));
       diffs.setItems(FXCollections.observableArrayList(main.getSizeDiffer()));
       remoteOnly.setItems(FXCollections.observableArrayList(main.getNotInLocal()));
@@ -76,7 +104,6 @@ public class DiffController implements Initializable {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-
   }
 
 }

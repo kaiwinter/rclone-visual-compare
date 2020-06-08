@@ -22,6 +22,8 @@ public class MainApplication extends Application {
     AnchorPane page = (AnchorPane) loader.load(getClass().getResourceAsStream("/RcloneDiff.fxml"));
     Scene scene = new Scene(page);
     DiffController controller = loader.getController();
+    controller.getLocalPath().setText("c:/temp/rclone-vs/2020/");
+    controller.getRemotePath().setText("DropboxTineCrypt:/2020/");
 
     primaryStage.setScene(scene);
     primaryStage.show();
