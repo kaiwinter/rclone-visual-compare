@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ResourceBundle;
 
+import org.apache.commons.io.FileUtils;
+
 import com.github.kaiwinter.rclonediff.model.LocalOnlyFile;
 import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
@@ -194,6 +196,19 @@ public class DiffController implements Initializable {
 
   public void setService(RcloneService rcloneService) {
     this.rcloneService = rcloneService;
+  }
+
+  /**
+   * Deletes the temporary directory.
+   */
+  public void deleteTempDirectory() {
+    if (tempDirectory != null) {
+      try {
+        FileUtils.deleteDirectory(tempDirectory.toFile());
+      } catch (IOException e) {
+        log.error("Couldn't delete temp directory '{}'", tempDirectory, e);
+      }
+    }
   }
 
 }

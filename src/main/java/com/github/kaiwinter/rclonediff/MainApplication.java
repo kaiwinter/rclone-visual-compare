@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 public class MainApplication extends Application {
 
   private final RcloneService service = new RcloneService();
+  private DiffController controller;
 
   public static void main(String[] args) {
     launch();
@@ -27,7 +28,7 @@ public class MainApplication extends Application {
     FXMLLoader loader = new FXMLLoader();
     AnchorPane page = (AnchorPane) loader.load(getClass().getResourceAsStream("/RcloneDiff.fxml"));
     Scene scene = new Scene(page);
-    DiffController controller = loader.getController();
+    controller = loader.getController();
     controller.getLocalPath().setText("c:/temp/rclone-vs/2020/");
     controller.getRemotePath().setText("DropboxTineCrypt:/2020/");
     controller.setService(service);
@@ -45,5 +46,10 @@ public class MainApplication extends Application {
     primaryStage.setScene(scene);
     primaryStage.show();
     primaryStage.setTitle("rclone visual diff");
+  }
+
+  @Override
+  public void stop() throws Exception {
+    controller.deleteTempDirectory();
   }
 }
