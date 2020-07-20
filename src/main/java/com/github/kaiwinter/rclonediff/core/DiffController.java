@@ -11,8 +11,6 @@ import org.apache.commons.io.FileUtils;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -84,70 +82,45 @@ public class DiffController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     rcloneCopyService = new RcloneCopyService(getTempDirectoryLazy());
-
-    localOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
-    remoteOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
-
     rcloneCopyService.setOnSucceeded(event -> {
       remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
       event.consume();
     });
 
-    diffs.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SyncFile>() {
+    localOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
+    diffs.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
+    remoteOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
 
-      @Override
-      public void changed(ObservableValue<? extends SyncFile> observable, SyncFile oldValue, SyncFile newValue) {
-        localOnlyImage.setImage(null);
-        remoteOnlyImage.setImage(null);
-        localOnly.getSelectionModel().clearSelection();
-        remoteOnly.getSelectionModel().clearSelection();
-        if (newValue == null) {
-          return;
-        }
-        Image image = new Image("file:///" + newValue.getLocalPath() + newValue.getFile());
-        boolean error = image.isError();
-        if (error) {
-          log.error("Fehler beim Laden des Bildes");
-        }
-        localOnlyImage.setImage(image);
-
-        rcloneCopyService.restart(newValue);
-      }
+    diffs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+      showLocal(newValue);
+      showRemote(newValue);
     });
 
-    localOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SyncFile>() {
+    localOnly.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showLocal(newValue));
+    remoteOnly.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showRemote(newValue));
 
-      @Override
-      public void changed(ObservableValue<? extends SyncFile> observable, SyncFile oldValue, SyncFile newValue) {
-        localOnlyImage.setImage(null);
-        diffs.getSelectionModel().clearSelection();
-        if (newValue == null) {
-          return;
-        }
-        Image image = new Image("file:///" + newValue.getLocalPath() + newValue.getFile());
-        boolean error = image.isError();
-        if (error) {
-          log.error("Fehler beim Laden des Bildes");
-        }
-        localOnlyImage.setImage(image);
-      }
-    });
+  }
 
-    remoteOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SyncFile>() {
+  protected void showRemote(SyncFile newValue) {
+    remoteOnlyImage.setImage(null);
+    if (newValue == null) {
+      return;
+    }
 
-      @Override
-      public void changed(ObservableValue<? extends SyncFile> observable, SyncFile oldValue, SyncFile newValue) {
-        remoteOnlyImage.setImage(null);
-        diffs.getSelectionModel().clearSelection();
-        if (newValue == null) {
-          return;
-        }
+    rcloneCopyService.restart(newValue);
+  }
 
-        rcloneCopyService.restart(newValue);
-      }
-
-    });
-
+  private void showLocal(SyncFile newValue) {
+    localOnlyImage.setImage(null);
+    if (newValue == null) {
+      return;
+    }
+    Image image = new Image("file:///" + newValue.getLocalPath() + newValue.getFile());
+    boolean error = image.isError();
+    if (error) {
+      log.error("Fehler beim Laden des Bildes");
+    }
+    localOnlyImage.setImage(image);
   }
 
   @FXML
