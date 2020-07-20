@@ -1,7 +1,6 @@
 package com.github.kaiwinter.rclonediff.core;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,21 +78,40 @@ public class DiffController implements Initializable {
   @FXML
   private Button diffButton;
 
-  private Path tempDirectory;
+  private static Path tempDirectory;
 
-  private RcloneService rcloneService;
+  private RcloneCopyService rcloneCopyService;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    rcloneCopyService = new RcloneCopyService(getTempDirectoryLazy());
+
     localOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter<LocalOnlyFile>()));
     remoteOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter<RemoteOnlyFile>()));
+
+    rcloneCopyService.setOnSucceeded(event -> {
+      remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
+      event.consume();
+    });
+
+    diffs.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        localOnlyImage.setImage(null);
+        remoteOnlyImage.setImage(null);
+        if (newValue == null) {
+          return;
+        }
+      }
+    });
 
     localOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<LocalOnlyFile>() {
 
       @Override
       public void changed(ObservableValue<? extends LocalOnlyFile> observable, LocalOnlyFile oldValue, LocalOnlyFile newValue) {
+        localOnlyImage.setImage(null);
         if (newValue == null) {
-          localOnlyImage.setImage(null);
           return;
         }
         Image image = new Image("file:///" + newValue.getLocalPath() + newValue.getFile());
@@ -109,56 +127,21 @@ public class DiffController implements Initializable {
 
       @Override
       public void changed(ObservableValue<? extends RemoteOnlyFile> observable, RemoteOnlyFile oldValue, RemoteOnlyFile newValue) {
+        remoteOnlyImage.setImage(null);
         if (newValue == null) {
-          remoteOnlyImage.setImage(null);
           return;
         }
 
-        rcloneService.setRunnable(() -> {
-          copy_internal(newValue);
-        });
-        rcloneService.restart();
+        rcloneCopyService.restart(newValue);
       }
 
-      private void copy_internal(RemoteOnlyFile newValue) {
-        // TODO: better filetype filter
-        if (!newValue.getFile().endsWith(".jpg")) {
-          // TODO: show placeholder
-          remoteOnlyImage.setImage(null);
-          return;
-        }
-
-        try {
-          Path completeFilePath = getTempDirectoryLazy().resolve(newValue.getFile());
-          if (!completeFilePath.toFile().exists()) {
-            RcloneWrapper.copy(newValue.getFile(), newValue.getRemotePath(), completeFilePath.getParent().toString());
-          }
-
-          // String filename = "file:///" + completeFilePath.toString();
-          URI filename = completeFilePath.toUri();
-          log.info("Showing file: {}", filename);
-          Image image = new Image(filename.toString());
-          boolean error = image.isError();
-          if (error) {
-            log.error("Fehler beim Laden des Bildes");
-          }
-          remoteOnlyImage.setImage(image);
-
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }
     });
 
   }
 
   @FXML
   public void diff(ActionEvent event) {
-    rcloneService.setRunnable(() -> {
-      diff_internal();
-    });
-    rcloneService.restart();
+    diff_internal();
   }
 
   private void diff_internal() {
@@ -187,15 +170,15 @@ public class DiffController implements Initializable {
 
   }
 
-  private Path getTempDirectoryLazy() throws IOException {
+  static synchronized Path getTempDirectoryLazy() {
     if (tempDirectory == null) {
-      tempDirectory = Files.createTempDirectory("rclone-diff");
+      try {
+        tempDirectory = Files.createTempDirectory("rclone-diff");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
     return tempDirectory;
-  }
-
-  public void setService(RcloneService rcloneService) {
-    this.rcloneService = rcloneService;
   }
 
   /**
