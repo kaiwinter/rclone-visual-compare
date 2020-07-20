@@ -8,8 +8,7 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
 
-import com.github.kaiwinter.rclonediff.model.LocalOnlyFile;
-import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
+import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
 import javafx.beans.value.ChangeListener;
@@ -41,7 +40,7 @@ public class DiffController implements Initializable {
 
   @Getter
   @FXML
-  private ListView<LocalOnlyFile> localOnly;
+  private ListView<SyncFile> localOnly;
 
   @Getter
   @FXML
@@ -49,7 +48,7 @@ public class DiffController implements Initializable {
 
   @Getter
   @FXML
-  private ListView<RemoteOnlyFile> remoteOnly;
+  private ListView<SyncFile> remoteOnly;
 
   @FXML
   private ImageView localOnlyImage;
@@ -86,8 +85,8 @@ public class DiffController implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     rcloneCopyService = new RcloneCopyService(getTempDirectoryLazy());
 
-    localOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter<LocalOnlyFile>()));
-    remoteOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter<RemoteOnlyFile>()));
+    localOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
+    remoteOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
 
     rcloneCopyService.setOnSucceeded(event -> {
       remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
@@ -106,10 +105,10 @@ public class DiffController implements Initializable {
       }
     });
 
-    localOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<LocalOnlyFile>() {
+    localOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SyncFile>() {
 
       @Override
-      public void changed(ObservableValue<? extends LocalOnlyFile> observable, LocalOnlyFile oldValue, LocalOnlyFile newValue) {
+      public void changed(ObservableValue<? extends SyncFile> observable, SyncFile oldValue, SyncFile newValue) {
         localOnlyImage.setImage(null);
         if (newValue == null) {
           return;
@@ -123,10 +122,10 @@ public class DiffController implements Initializable {
       }
     });
 
-    remoteOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<RemoteOnlyFile>() {
+    remoteOnly.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SyncFile>() {
 
       @Override
-      public void changed(ObservableValue<? extends RemoteOnlyFile> observable, RemoteOnlyFile oldValue, RemoteOnlyFile newValue) {
+      public void changed(ObservableValue<? extends SyncFile> observable, SyncFile oldValue, SyncFile newValue) {
         remoteOnlyImage.setImage(null);
         if (newValue == null) {
           return;

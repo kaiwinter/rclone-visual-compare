@@ -1,27 +1,33 @@
 package com.github.kaiwinter.rclonediff.model;
 
+import lombok.Data;
+
 /**
  * A file which needs a sync.
  */
-public interface SyncFile {
+@Data
+public class SyncFile {
 
   /**
-   * @return the file name, may contains path fragment
+   * the file name, may contains path fragment
    */
-  String getFile();
+  private final String file;
 
   /**
-   * @return the local path
+   * the local path
    */
-  String getLocalPath();
+  private final String localPath;
 
   /**
-   * @return the remote path
+   * the remote path
    */
-  String getRemotePath();
+  private final String remotePath;
 
   /**
-   * @return A String representation to be shown in the UI.
+   * A String representation to be shown in the UI.
    */
-  String toUiString();
+  public String toUiString() {
+    return file + ": " + localPath + " -> " + remotePath;
+  }
+
 }

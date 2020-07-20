@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 
-import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
+import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -24,7 +24,7 @@ public class RcloneCopyService extends Service<Void> {
 
   @Getter
   private Image loadedImage;
-  private RemoteOnlyFile newValue;
+  private SyncFile newValue;
 
   @Override
   protected Task<Void> createTask() {
@@ -71,7 +71,7 @@ public class RcloneCopyService extends Service<Void> {
     }
   }
 
-  public void restart(RemoteOnlyFile newValue) {
+  public void restart(SyncFile newValue) {
     super.cancel();
     this.newValue = newValue;
     super.restart();

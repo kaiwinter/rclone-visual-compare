@@ -5,20 +5,17 @@ import com.github.kaiwinter.rclonediff.model.SyncFile;
 import javafx.util.StringConverter;
 
 /**
- * Renders an implementation of {@link SyncFile}. The opposite direction is not implemented!
- *
- * @param <T>
- *          Implementation of {@link SyncFile}
+ * Renders a {@link SyncFile}. The opposite direction is not implemented!
  */
-public class SyncFileStringConverter<T extends SyncFile> extends StringConverter<T> {
+public class SyncFileStringConverter extends StringConverter<SyncFile> {
 
   @Override
-  public String toString(T object) {
+  public String toString(SyncFile object) {
     return object.toUiString();
   }
 
   @Override
-  public T fromString(String string) {
+  public SyncFile fromString(String string) {
     throw new UnsupportedOperationException();
   }
 

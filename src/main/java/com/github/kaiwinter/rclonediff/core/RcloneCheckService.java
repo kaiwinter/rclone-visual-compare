@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.kaiwinter.rclonediff.model.LocalOnlyFile;
-import com.github.kaiwinter.rclonediff.model.RemoteOnlyFile;
+import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -36,10 +35,10 @@ public class RcloneCheckService extends Service<Void> {
   private List<String> sizeDiffer = new ArrayList<>();
 
   @Getter
-  private List<RemoteOnlyFile> notInLocal = new ArrayList<>();
+  private List<SyncFile> notInLocal = new ArrayList<>();
 
   @Getter
-  private List<LocalOnlyFile> notInRemote = new ArrayList<>();
+  private List<SyncFile> notInRemote = new ArrayList<>();
 
   @Override
   protected Task<Void> createTask() {
@@ -68,9 +67,9 @@ public class RcloneCheckService extends Service<Void> {
       if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
         sizeDiffer.add(matcher.group(1));
       } else if ((matcher = NOT_IN_LOCAL.matcher(line)).matches()) {
-        notInLocal.add(new RemoteOnlyFile(matcher.group(1), matcher.group(2), remotePath));
+        notInLocal.add(new SyncFile(matcher.group(1), matcher.group(2), remotePath));
       } else if ((matcher = NOT_IN_REMOTE.matcher(line)).matches()) {
-        notInRemote.add(new LocalOnlyFile(matcher.group(1), localPath, matcher.group(2)));
+        notInRemote.add(new SyncFile(matcher.group(1), localPath, matcher.group(2)));
       } else if ((matcher = NUMBER_OF_DIFFERENCES.matcher(line)).matches()) {
         long expectedEntries = Long.valueOf(matcher.group(1));
         long actualEntries = sizeDiffer.size() + notInLocal.size() + notInRemote.size();
