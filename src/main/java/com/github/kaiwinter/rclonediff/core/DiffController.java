@@ -75,7 +75,7 @@ public class DiffController implements Initializable {
   @FXML
   private Button diffButton;
 
-  private static Path tempDirectory;
+  private Path tempDirectory;
 
   private RcloneCopyService rcloneCopyService;
 
@@ -154,7 +154,7 @@ public class DiffController implements Initializable {
 
   }
 
-  static synchronized Path getTempDirectoryLazy() {
+  private Path getTempDirectoryLazy() {
     if (tempDirectory == null) {
       try {
         tempDirectory = Files.createTempDirectory("rclone-diff");

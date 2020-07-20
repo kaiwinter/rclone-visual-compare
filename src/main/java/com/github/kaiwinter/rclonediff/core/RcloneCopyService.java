@@ -46,7 +46,7 @@ public class RcloneCopyService extends Service<Void> {
       return;
     }
 
-    Path completeFilePath = DiffController.getTempDirectoryLazy().resolve(newValue.getFile());
+    Path completeFilePath = tempDirectory.resolve(newValue.getFile());
     if (!completeFilePath.toFile().exists()) {
       RcloneWrapper.copy(newValue.getFile(), newValue.getRemotePath(), completeFilePath.getParent().toString());
     }
@@ -61,14 +61,6 @@ public class RcloneCopyService extends Service<Void> {
     }
     this.loadedImage = image;
 
-  }
-
-  private static void wait(Process process) {
-    try {
-      process.waitFor();
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   public void restart(SyncFile newValue) {
