@@ -32,7 +32,7 @@ public class RcloneCheckService extends Service<Void> {
   private final String remotePath;
 
   @Getter
-  private List<String> sizeDiffer = new ArrayList<>();
+  private List<SyncFile> sizeDiffer = new ArrayList<>();
 
   @Getter
   private List<SyncFile> notInLocal = new ArrayList<>();
@@ -65,7 +65,7 @@ public class RcloneCheckService extends Service<Void> {
       log.debug(line);
 
       if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
-        sizeDiffer.add(matcher.group(1));
+        sizeDiffer.add(new SyncFile(matcher.group(1), localPath, remotePath));
       } else if ((matcher = NOT_IN_LOCAL.matcher(line)).matches()) {
         notInLocal.add(new SyncFile(matcher.group(1), matcher.group(2), remotePath));
       } else if ((matcher = NOT_IN_REMOTE.matcher(line)).matches()) {

@@ -44,7 +44,7 @@ public class DiffController implements Initializable {
 
   @Getter
   @FXML
-  private ListView<String> diffs;
+  private ListView<SyncFile> diffs;
 
   @Getter
   @FXML
@@ -93,15 +93,25 @@ public class DiffController implements Initializable {
       event.consume();
     });
 
-    diffs.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+    diffs.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SyncFile>() {
 
       @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+      public void changed(ObservableValue<? extends SyncFile> observable, SyncFile oldValue, SyncFile newValue) {
         localOnlyImage.setImage(null);
         remoteOnlyImage.setImage(null);
+        localOnly.getSelectionModel().clearSelection();
+        remoteOnly.getSelectionModel().clearSelection();
         if (newValue == null) {
           return;
         }
+        Image image = new Image("file:///" + newValue.getLocalPath() + newValue.getFile());
+        boolean error = image.isError();
+        if (error) {
+          log.error("Fehler beim Laden des Bildes");
+        }
+        localOnlyImage.setImage(image);
+
+        rcloneCopyService.restart(newValue);
       }
     });
 
@@ -110,6 +120,7 @@ public class DiffController implements Initializable {
       @Override
       public void changed(ObservableValue<? extends SyncFile> observable, SyncFile oldValue, SyncFile newValue) {
         localOnlyImage.setImage(null);
+        diffs.getSelectionModel().clearSelection();
         if (newValue == null) {
           return;
         }
@@ -127,6 +138,7 @@ public class DiffController implements Initializable {
       @Override
       public void changed(ObservableValue<? extends SyncFile> observable, SyncFile oldValue, SyncFile newValue) {
         remoteOnlyImage.setImage(null);
+        diffs.getSelectionModel().clearSelection();
         if (newValue == null) {
           return;
         }
