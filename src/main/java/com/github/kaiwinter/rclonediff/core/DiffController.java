@@ -77,16 +77,8 @@ public class DiffController implements Initializable {
 
   private Path tempDirectory;
 
-  private RcloneCopyService rcloneCopyService;
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    rcloneCopyService = new RcloneCopyService(getTempDirectoryLazy());
-    rcloneCopyService.setOnSucceeded(event -> {
-      remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
-      event.consume();
-    });
-
     localOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
     diffs.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
     remoteOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
@@ -107,7 +99,12 @@ public class DiffController implements Initializable {
       return;
     }
 
-    rcloneCopyService.restart(newValue);
+    RcloneCopyService rcloneCopyService = new RcloneCopyService(newValue, getTempDirectoryLazy());
+    rcloneCopyService.setOnSucceeded(event -> {
+      remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
+      event.consume();
+    });
+    rcloneCopyService.start();
   }
 
   private void showLocal(SyncFile newValue) {
@@ -151,7 +148,6 @@ public class DiffController implements Initializable {
       remoteOnlyLabel.setText("Remote only (" + rcloneCheckService.getNotInLocal().size() + ")");
     });
     rcloneCheckService.start();
-
   }
 
   private Path getTempDirectoryLazy() {

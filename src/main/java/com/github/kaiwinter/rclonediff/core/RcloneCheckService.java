@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class RcloneCheckService extends Service<Void> {
+public class RcloneCheckService extends RcloneService {
 
   private static final Pattern SIZES_DIFFER = Pattern.compile(".*ERROR : (.*): Sizes differ");
   private static final Pattern NOT_IN_LOCAL = Pattern.compile(".*ERROR : (.*): File not in Local file system at \\/\\/\\?\\/(.*)");
@@ -41,18 +40,7 @@ public class RcloneCheckService extends Service<Void> {
   private List<SyncFile> notInRemote = new ArrayList<>();
 
   @Override
-  protected Task<Void> createTask() {
-
-    return new Task<Void>() {
-      @Override
-      protected Void call() throws Exception {
-        check();
-        return null;
-      }
-    };
-  }
-
-  private void check() throws IOException {
+  protected void execute() throws IOException {
     String command = "rclone check " + localPath + " " + remotePath;
     log.info("Check command: {}", command);
 
@@ -81,13 +69,5 @@ public class RcloneCheckService extends Service<Void> {
 
     wait(process);
     log.debug("check value code {}", process.exitValue());
-  }
-
-  private static void wait(Process process) {
-    try {
-      process.waitFor();
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 }

@@ -1,13 +1,14 @@
 package com.github.kaiwinter.rclonediff.core;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Path;
 
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,40 +19,28 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class RcloneCopyService extends Service<Void> {
+public class RcloneCopyService extends RcloneService {
 
+  private final SyncFile syncFile;
   private final Path tempDirectory;
 
   @Getter
   private Image loadedImage;
-  private SyncFile newValue;
 
   @Override
-  protected Task<Void> createTask() {
-
-    return new Task<Void>() {
-      @Override
-      protected Void call() throws Exception {
-        copy();
-        return null;
-      }
-    };
-  }
-
-  private void copy() throws IOException {
+  protected void execute() throws IOException {
     // TODO: better filetype filter
-    if (!newValue.getFile().endsWith(".jpg")) {
+    if (!syncFile.getFile().endsWith(".jpg")) {
       // TODO: show placeholder
       this.loadedImage = null;
       return;
     }
 
-    Path completeFilePath = tempDirectory.resolve(newValue.getFile());
+    Path completeFilePath = tempDirectory.resolve(syncFile.getFile());
     if (!completeFilePath.toFile().exists()) {
-      RcloneWrapper.copy(newValue.getFile(), newValue.getRemotePath(), completeFilePath.getParent().toString());
+      copyFileFromTo(syncFile.getFile(), syncFile.getRemotePath(), completeFilePath.getParent().toString());
     }
 
-    // String filename = "file:///" + completeFilePath.toString();
     URI filename = completeFilePath.toUri();
     log.info("Showing file: {}", filename);
     Image image = new Image(filename.toString());
@@ -60,12 +49,20 @@ public class RcloneCopyService extends Service<Void> {
       log.error("Fehler beim Laden des Bildes");
     }
     this.loadedImage = image;
-
   }
 
-  public void restart(SyncFile newValue) {
-    super.cancel();
-    this.newValue = newValue;
-    super.restart();
+  private static void copyFileFromTo(String file, String fromPath, String toPath) throws IOException {
+    String command = "rclone copy " + fromPath + "/" + file + " " + toPath;
+    log.info("Copy command: {}", command);
+
+    Process process = Runtime.getRuntime().exec(command);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+    String line;
+    while ((line = reader.readLine()) != null) {
+      log.error(line);
+    }
+    wait(process);
+    log.info("check value code {}", process.exitValue());
   }
 }
