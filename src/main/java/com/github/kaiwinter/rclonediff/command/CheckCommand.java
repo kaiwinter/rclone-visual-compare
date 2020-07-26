@@ -1,4 +1,4 @@
-package com.github.kaiwinter.rclonediff.core;
+package com.github.kaiwinter.rclonediff.command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class RcloneCheckService extends RcloneService {
+public class CheckCommand extends AbstractCommand {
 
   private static final Pattern SIZES_DIFFER = Pattern.compile(".*ERROR : (.*): Sizes differ");
   private static final Pattern NOT_IN_LOCAL = Pattern.compile(".*ERROR : (.*): File not in Local file system at \\/\\/\\?\\/(.*)");

@@ -1,4 +1,4 @@
-package com.github.kaiwinter.rclonediff.core;
+package com.github.kaiwinter.rclonediff.command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,12 +19,12 @@ import lombok.extern.slf4j.Slf4j;
  * {@link Service} which calls a rclone check command.
  */
 @Slf4j
-public class RcloneCopyService extends RcloneService {
+public class CopyCommand extends AbstractCommand {
 
   private static final Object $LOCK = new Object[0];
 
   @Setter(onMethod_ = @Synchronized)
-  private static RcloneCopyService latest;
+  private static CopyCommand latest;
 
   private final SyncFile syncFile;
   private final Path tempDirectory;
@@ -32,10 +32,10 @@ public class RcloneCopyService extends RcloneService {
   @Getter
   private Image loadedImage;
 
-  public RcloneCopyService(SyncFile syncFile, Path tempDirectory) {
+  public CopyCommand(SyncFile syncFile, Path tempDirectory) {
     this.syncFile = syncFile;
     this.tempDirectory = tempDirectory;
-    RcloneCopyService.setLatest(this);
+    CopyCommand.setLatest(this);
   }
 
   @Override
@@ -76,9 +76,9 @@ public class RcloneCopyService extends RcloneService {
   }
 
   /**
-   * @return <code>true</code> if this is the last {@link RcloneCopyService} which was started
+   * @return <code>true</code> if this is the last {@link CopyCommand} which was started
    */
-  public boolean isLatestRcloneCopyService() {
+  public boolean isLatestCopyCommand() {
     return this == latest;
   }
 }

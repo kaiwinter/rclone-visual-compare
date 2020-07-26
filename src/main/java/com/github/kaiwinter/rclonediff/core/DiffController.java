@@ -8,6 +8,8 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
 
+import com.github.kaiwinter.rclonediff.command.CheckCommand;
+import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
@@ -99,9 +101,9 @@ public class DiffController implements Initializable {
       return;
     }
 
-    RcloneCopyService rcloneCopyService = new RcloneCopyService(newValue, getTempDirectoryLazy());
+    CopyCommand rcloneCopyService = new CopyCommand(newValue, getTempDirectoryLazy());
     rcloneCopyService.setOnSucceeded(event -> {
-      if (rcloneCopyService.isLatestRcloneCopyService()) {
+      if (rcloneCopyService.isLatestCopyCommand()) {
         remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
         event.consume();
       }
@@ -128,7 +130,7 @@ public class DiffController implements Initializable {
   }
 
   private void diff_internal() {
-    RcloneCheckService rcloneCheckService = new RcloneCheckService(localPath.getText(), remotePath.getText());
+    CheckCommand rcloneCheckService = new CheckCommand(localPath.getText(), remotePath.getText());
 
     // scene.getRoot().cursorProperty().bind(Bindings.when(rcloneCheckService.runningProperty()).then(Cursor.WAIT).otherwise(Cursor.DEFAULT));
     localPath.disableProperty().bind(rcloneCheckService.runningProperty());

@@ -1,11 +1,11 @@
-package com.github.kaiwinter.rclonediff.core;
+package com.github.kaiwinter.rclonediff.command;
 
 import java.io.IOException;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-public abstract class RcloneService extends Service<Void> {
+public abstract class AbstractCommand extends Service<Void> {
 
   @Override
   protected Task<Void> createTask() {
