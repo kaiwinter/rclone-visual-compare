@@ -101,8 +101,10 @@ public class DiffController implements Initializable {
 
     RcloneCopyService rcloneCopyService = new RcloneCopyService(newValue, getTempDirectoryLazy());
     rcloneCopyService.setOnSucceeded(event -> {
-      remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
-      event.consume();
+      if (rcloneCopyService.isLatestRcloneCopyService()) {
+        remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
+        event.consume();
+      }
     });
     rcloneCopyService.start();
   }

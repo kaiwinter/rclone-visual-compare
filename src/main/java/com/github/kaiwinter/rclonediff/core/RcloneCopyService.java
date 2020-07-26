@@ -11,21 +11,32 @@ import com.github.kaiwinter.rclonediff.model.SyncFile;
 import javafx.concurrent.Service;
 import javafx.scene.image.Image;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link Service} which calls a rclone check command.
  */
 @Slf4j
-@RequiredArgsConstructor
 public class RcloneCopyService extends RcloneService {
+
+  private static final Object $LOCK = new Object[0];
+
+  @Setter(onMethod_ = @Synchronized)
+  private static RcloneCopyService latest;
 
   private final SyncFile syncFile;
   private final Path tempDirectory;
 
   @Getter
   private Image loadedImage;
+
+  public RcloneCopyService(SyncFile syncFile, Path tempDirectory) {
+    this.syncFile = syncFile;
+    this.tempDirectory = tempDirectory;
+    RcloneCopyService.setLatest(this);
+  }
 
   @Override
   protected void execute() throws IOException {
@@ -38,20 +49,18 @@ public class RcloneCopyService extends RcloneService {
 
     Path completeFilePath = tempDirectory.resolve(syncFile.getFile());
     if (!completeFilePath.toFile().exists()) {
-      copyFileFromTo(syncFile.getFile(), syncFile.getRemotePath(), completeFilePath.getParent().toString());
+      copyFileFromTo(syncFile.getFile(), syncFile.getRemotePath(), completeFilePath.getParent());
     }
 
     URI filename = completeFilePath.toUri();
-    log.info("Showing file: {}", filename);
-    Image image = new Image(filename.toString());
-    boolean error = image.isError();
-    if (error) {
+
+    this.loadedImage = new Image(filename.toString());
+    if (this.loadedImage.isError()) {
       log.error("Fehler beim Laden des Bildes");
     }
-    this.loadedImage = image;
   }
 
-  private static void copyFileFromTo(String file, String fromPath, String toPath) throws IOException {
+  private static void copyFileFromTo(String file, String fromPath, Path toPath) throws IOException {
     String command = "rclone copy " + fromPath + "/" + file + " " + toPath;
     log.info("Copy command: {}", command);
 
@@ -64,5 +73,12 @@ public class RcloneCopyService extends RcloneService {
     }
     wait(process);
     log.info("check value code {}", process.exitValue());
+  }
+
+  /**
+   * @return <code>true</code> if this is the last {@link RcloneCopyService} which was started
+   */
+  public boolean isLatestRcloneCopyService() {
+    return this == latest;
   }
 }
