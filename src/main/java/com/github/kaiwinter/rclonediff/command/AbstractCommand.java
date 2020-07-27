@@ -4,7 +4,12 @@ import java.io.IOException;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Parent class for rclone commands.
+ */
+@Slf4j
 public abstract class AbstractCommand extends Service<Void> {
 
   @Override
@@ -12,7 +17,12 @@ public abstract class AbstractCommand extends Service<Void> {
     return new Task<Void>() {
       @Override
       protected Void call() throws Exception {
-        execute();
+        try {
+          execute();
+        } catch (Throwable e) {
+          log.error("Error: ", e);
+          throw e;
+        }
         return null;
       }
     };

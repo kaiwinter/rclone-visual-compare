@@ -10,13 +10,12 @@ import java.util.regex.Pattern;
 
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
-import javafx.concurrent.Service;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link Service} which calls a rclone check command.
+ * Executes a rclone check command.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +26,7 @@ public class CheckCommand extends AbstractCommand {
   private static final Pattern NOT_IN_REMOTE = Pattern.compile(".*ERROR : (.*): File not in .*'(.*)'");
   private static final Pattern NUMBER_OF_DIFFERENCES = Pattern.compile(".* (.*) differences found");
 
+  private final Runtime runtime;
   private final String localPath;
   private final String remotePath;
 
@@ -44,7 +44,7 @@ public class CheckCommand extends AbstractCommand {
     String command = "rclone check " + localPath + " " + remotePath;
     log.info("Check command: {}", command);
 
-    Process process = Runtime.getRuntime().exec(command);
+    Process process = runtime.exec(command);
     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
     String line;
@@ -62,7 +62,9 @@ public class CheckCommand extends AbstractCommand {
         long expectedEntries = Long.valueOf(matcher.group(1));
         long actualEntries = sizeDiffer.size() + notInLocal.size() + notInRemote.size();
         if (expectedEntries != actualEntries) {
-          throw new AssertionError("Excepted " + expectedEntries + " actually: " + actualEntries);
+          String message = "Excepted " + expectedEntries + " parsed differences, actually parsed: " + actualEntries;
+          log.error(message);
+          throw new AssertionError(message);
         }
       }
     }

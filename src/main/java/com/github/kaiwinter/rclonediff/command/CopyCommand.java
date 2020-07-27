@@ -8,7 +8,6 @@ import java.nio.file.Path;
 
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
-import javafx.concurrent.Service;
 import javafx.scene.image.Image;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +15,7 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link Service} which calls a rclone check command.
+ * Executes a rclone copy command.
  */
 @Slf4j
 public class CopyCommand extends AbstractCommand {
@@ -26,13 +25,25 @@ public class CopyCommand extends AbstractCommand {
   @Setter(onMethod_ = @Synchronized)
   private static CopyCommand latest;
 
+  private final Runtime runtime;
   private final SyncFile syncFile;
   private final Path tempDirectory;
 
   @Getter
   private Image loadedImage;
 
-  public CopyCommand(SyncFile syncFile, Path tempDirectory) {
+  /**
+   * Constructs a new {@link CopyCommand}.
+   * 
+   * @param runtime
+   *          the {@link Runnable} to execute the rclone command
+   * @param syncFile
+   *          the {@link SyncFile} which contains informations about the file which should be copied.
+   * @param tempDirectory
+   *          directory to store temporary files
+   */
+  public CopyCommand(Runtime runtime, SyncFile syncFile, Path tempDirectory) {
+    this.runtime = runtime;
     this.syncFile = syncFile;
     this.tempDirectory = tempDirectory;
     CopyCommand.setLatest(this);
@@ -60,11 +71,11 @@ public class CopyCommand extends AbstractCommand {
     }
   }
 
-  private static void copyFileFromTo(String file, String fromPath, Path toPath) throws IOException {
+  private void copyFileFromTo(String file, String fromPath, Path toPath) throws IOException {
     String command = "rclone copy " + fromPath + "/" + file + " " + toPath;
     log.info("Copy command: {}", command);
 
-    Process process = Runtime.getRuntime().exec(command);
+    Process process = runtime.exec(command);
     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
     String line;

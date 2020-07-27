@@ -14,7 +14,6 @@ import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -101,7 +100,7 @@ public class DiffController implements Initializable {
       return;
     }
 
-    CopyCommand rcloneCopyService = new CopyCommand(newValue, getTempDirectoryLazy());
+    CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), newValue, getTempDirectoryLazy());
     rcloneCopyService.setOnSucceeded(event -> {
       if (rcloneCopyService.isLatestCopyCommand()) {
         remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
@@ -125,12 +124,8 @@ public class DiffController implements Initializable {
   }
 
   @FXML
-  public void diff(ActionEvent event) {
-    diff_internal();
-  }
-
-  private void diff_internal() {
-    CheckCommand rcloneCheckService = new CheckCommand(localPath.getText(), remotePath.getText());
+  public void diff() {
+    CheckCommand rcloneCheckService = new CheckCommand(Runtime.getRuntime(), localPath.getText(), remotePath.getText());
 
     // scene.getRoot().cursorProperty().bind(Bindings.when(rcloneCheckService.runningProperty()).then(Cursor.WAIT).otherwise(Cursor.DEFAULT));
     localPath.disableProperty().bind(rcloneCheckService.runningProperty());

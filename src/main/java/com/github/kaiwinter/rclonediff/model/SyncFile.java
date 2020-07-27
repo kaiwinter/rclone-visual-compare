@@ -9,7 +9,7 @@ import lombok.Data;
 public class SyncFile {
 
   /**
-   * the file name, may contains path fragment
+   * the file name, may contain path fragment
    */
   private final String file;
 
@@ -24,7 +24,7 @@ public class SyncFile {
   private final String remotePath;
 
   /**
-   * A String representation to be shown in the UI.
+   * @return a String representation to be shown in the UI.
    */
   public String toUiString() {
     return file + ": " + localPath + " -> " + remotePath;
