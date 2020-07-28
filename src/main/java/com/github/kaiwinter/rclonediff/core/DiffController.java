@@ -31,15 +31,15 @@ public class DiffController implements Initializable {
 
   @Getter
   @FXML
-  private TextField localPath;
+  private TextField sourcePath;
 
   @Getter
   @FXML
-  private TextField remotePath;
+  private TextField targetPath;
 
   @Getter
   @FXML
-  private ListView<SyncFile> localOnly;
+  private ListView<SyncFile> sourceOnly;
 
   @Getter
   @FXML
@@ -47,30 +47,30 @@ public class DiffController implements Initializable {
 
   @Getter
   @FXML
-  private ListView<SyncFile> remoteOnly;
+  private ListView<SyncFile> targetOnly;
 
   @FXML
-  private ImageView localOnlyImage;
+  private ImageView sourceOnlyImage;
 
   @FXML
-  private ImageView remoteOnlyImage;
+  private ImageView targetOnlyImage;
 
   @FXML
-  private Label localOnlyLabel;
+  private Label sourceOnlyLabel;
 
   @FXML
   private Label diffsLabel;
 
   @FXML
-  private Label remoteOnlyLabel;
+  private Label targetOnlyLabel;
 
   @Getter
   @FXML
-  private Button localChooseButton;
+  private Button sourceChooseButton;
 
   @Getter
   @FXML
-  private Button remoteChooseButton;
+  private Button targetChooseButton;
 
   @Getter
   @FXML
@@ -80,71 +80,97 @@ public class DiffController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    localOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
+    sourceOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
     diffs.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
-    remoteOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
+    targetOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
 
     diffs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-      showLocal(newValue);
-      showRemote(newValue);
+      showImageFromSourcePath(newValue);
+      showImageFromTargetPath(newValue);
     });
 
-    localOnly.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showLocal(newValue));
-    remoteOnly.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showRemote(newValue));
-
+    sourceOnly.getSelectionModel().selectedItemProperty()
+      .addListener((observable, oldValue, newValue) -> showImageFromSourcePath(newValue));
+    targetOnly.getSelectionModel().selectedItemProperty()
+      .addListener((observable, oldValue, newValue) -> showImageFromTargetPath(newValue));
   }
 
-  protected void showRemote(SyncFile newValue) {
-    remoteOnlyImage.setImage(null);
-    if (newValue == null) {
+  private void showImageFromSourcePath(SyncFile syncFile) {
+    sourceOnlyImage.setImage(null);
+    if (syncFile == null) {
       return;
     }
 
-    CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), newValue, getTempDirectoryLazy());
+    String path = sourcePath.getText();
+
+    if (isLocalPath(path)) {
+      showLocalFile(path, syncFile, sourceOnlyImage);
+    } else {
+      showRemoteFile(path, syncFile, sourceOnlyImage);
+    }
+  }
+
+  private void showImageFromTargetPath(SyncFile syncFile) {
+    targetOnlyImage.setImage(null);
+    if (syncFile == null) {
+      return;
+    }
+
+    String path = targetPath.getText();
+
+    if (isLocalPath(path)) {
+      showLocalFile(path, syncFile, targetOnlyImage);
+    } else {
+      showRemoteFile(path, syncFile, targetOnlyImage);
+    }
+  }
+
+  private boolean isLocalPath(String path) {
+    return path.startsWith("c:");
+  }
+
+  private void showLocalFile(String path, SyncFile syncFile, ImageView targetImageView) {
+    Image image = new Image("file:///" + path + syncFile.getFile());
+    boolean error = image.isError();
+    if (error) {
+      log.error("Fehler beim Laden des Bildes");
+    }
+    targetImageView.setImage(image);
+  }
+
+  private void showRemoteFile(String path, SyncFile syncFile, ImageView targetImageView) {
+    CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), path, syncFile, getTempDirectoryLazy());
     rcloneCopyService.setOnSucceeded(event -> {
       if (rcloneCopyService.isLatestCopyCommand()) {
-        remoteOnlyImage.setImage(rcloneCopyService.getLoadedImage());
+        targetImageView.setImage(rcloneCopyService.getLoadedImage());
         event.consume();
       }
     });
     rcloneCopyService.start();
   }
 
-  private void showLocal(SyncFile newValue) {
-    localOnlyImage.setImage(null);
-    if (newValue == null) {
-      return;
-    }
-    Image image = new Image("file:///" + newValue.getLocalPath() + newValue.getFile());
-    boolean error = image.isError();
-    if (error) {
-      log.error("Fehler beim Laden des Bildes");
-    }
-    localOnlyImage.setImage(image);
-  }
-
   @FXML
   public void diff() {
-    CheckCommand rcloneCheckService = new CheckCommand(Runtime.getRuntime(), localPath.getText(), remotePath.getText());
+    CheckCommand rcloneCheckService = new CheckCommand(Runtime.getRuntime(), sourcePath.getText(), targetPath.getText());
 
     // scene.getRoot().cursorProperty().bind(Bindings.when(rcloneCheckService.runningProperty()).then(Cursor.WAIT).otherwise(Cursor.DEFAULT));
-    localPath.disableProperty().bind(rcloneCheckService.runningProperty());
-    remotePath.disableProperty().bind(rcloneCheckService.runningProperty());
-    localChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
-    remoteChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
+    sourcePath.disableProperty().bind(rcloneCheckService.runningProperty());
+    targetPath.disableProperty().bind(rcloneCheckService.runningProperty());
+    sourceChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
+    targetChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
     diffButton.disableProperty().bind(rcloneCheckService.runningProperty());
-    localOnly.disableProperty().bind(rcloneCheckService.runningProperty());
-    remoteOnly.disableProperty().bind(rcloneCheckService.runningProperty());
+    sourceOnly.disableProperty().bind(rcloneCheckService.runningProperty());
+    targetOnly.disableProperty().bind(rcloneCheckService.runningProperty());
     diffs.disableProperty().bind(rcloneCheckService.runningProperty());
 
     rcloneCheckService.setOnSucceeded(event -> {
-      localOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInRemote()));
+      sourceOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInRemote()));
       diffs.setItems(FXCollections.observableArrayList(rcloneCheckService.getSizeDiffer()));
-      remoteOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInLocal()));
+      targetOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInLocal()));
 
-      localOnlyLabel.setText("Local only (" + rcloneCheckService.getNotInRemote().size() + ")");
+      sourceOnlyLabel.setText("Local only (" + rcloneCheckService.getNotInRemote().size() + ")");
       diffsLabel.setText("Different content (" + rcloneCheckService.getSizeDiffer().size() + ")");
-      remoteOnlyLabel.setText("Remote only (" + rcloneCheckService.getNotInLocal().size() + ")");
+      targetOnlyLabel.setText("Remote only (" + rcloneCheckService.getNotInLocal().size() + ")");
     });
     rcloneCheckService.start();
   }

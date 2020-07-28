@@ -43,10 +43,10 @@ class CopyCommandTest {
   @Test
   void valid_command() throws IOException {
     Runtime runtime = mock(Runtime.class, Answers.RETURNS_MOCKS);
-    SyncFile syncFile = new SyncFile("file.jpg", "c:/temp/", "Dropbox:/backup");
+    SyncFile syncFile = new SyncFile("file.jpg");
     Path tempDirectory = Path.of("c:/systemp");
 
-    CopyCommand copyCommand = new CopyCommand(runtime, syncFile, tempDirectory);
+    CopyCommand copyCommand = new CopyCommand(runtime, "Dropbox:/backup", syncFile, tempDirectory);
     copyCommand.createTask().run();
 
     verify(runtime).exec(eq("rclone copy Dropbox:/backup/file.jpg c:" + File.separator + "systemp"));
@@ -60,10 +60,10 @@ class CopyCommandTest {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(new byte[] {})).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    SyncFile syncFile = new SyncFile("file.jpg", "c:/temp/", "Dropbox:/backup");
+    SyncFile syncFile = new SyncFile("file.jpg");
     Path tempDirectory = Path.of("c:/systemp");
 
-    CopyCommand copyCommand = new CopyCommand(runtime, syncFile, tempDirectory);
+    CopyCommand copyCommand = new CopyCommand(runtime, "Dropbox:/backup", syncFile, tempDirectory);
     copyCommand.createTask().run();
 
     assertNotNull(copyCommand.getLoadedImage());

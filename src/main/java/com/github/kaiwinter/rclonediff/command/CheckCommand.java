@@ -27,8 +27,8 @@ public class CheckCommand extends AbstractCommand {
   private static final Pattern NUMBER_OF_DIFFERENCES = Pattern.compile(".* (.*) differences found");
 
   private final Runtime runtime;
-  private final String localPath;
-  private final String remotePath;
+  private final String sourcePath;
+  private final String targetPath;
 
   @Getter
   private List<SyncFile> sizeDiffer = new ArrayList<>();
@@ -41,7 +41,7 @@ public class CheckCommand extends AbstractCommand {
 
   @Override
   protected void execute() throws IOException {
-    String command = "rclone check " + localPath + " " + remotePath;
+    String command = "rclone check " + sourcePath + " " + targetPath;
     log.info("Check command: {}", command);
 
     Process process = runtime.exec(command);
@@ -53,11 +53,11 @@ public class CheckCommand extends AbstractCommand {
       log.debug(line);
 
       if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
-        sizeDiffer.add(new SyncFile(matcher.group(1), localPath, remotePath));
+        sizeDiffer.add(new SyncFile(matcher.group(1)));
       } else if ((matcher = NOT_IN_LOCAL.matcher(line)).matches()) {
-        notInLocal.add(new SyncFile(matcher.group(1), matcher.group(2), remotePath));
+        notInLocal.add(new SyncFile(matcher.group(1)));
       } else if ((matcher = NOT_IN_REMOTE.matcher(line)).matches()) {
-        notInRemote.add(new SyncFile(matcher.group(1), localPath, matcher.group(2)));
+        notInRemote.add(new SyncFile(matcher.group(1)));
       } else if ((matcher = NUMBER_OF_DIFFERENCES.matcher(line)).matches()) {
         long expectedEntries = Long.valueOf(matcher.group(1));
         long actualEntries = sizeDiffer.size() + notInLocal.size() + notInRemote.size();

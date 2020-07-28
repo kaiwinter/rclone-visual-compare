@@ -13,21 +13,4 @@ public class SyncFile {
    */
   private final String file;
 
-  /**
-   * the local path
-   */
-  private final String localPath;
-
-  /**
-   * the remote path
-   */
-  private final String remotePath;
-
-  /**
-   * @return a String representation to be shown in the UI.
-   */
-  public String toUiString() {
-    return file + ": " + localPath + " -> " + remotePath;
-  }
-
 }
