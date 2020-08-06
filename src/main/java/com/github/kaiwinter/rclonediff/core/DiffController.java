@@ -3,7 +3,9 @@ package com.github.kaiwinter.rclonediff.core;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
@@ -126,11 +128,16 @@ public class DiffController implements Initializable {
   }
 
   private boolean isLocalPath(String path) {
-    return path.startsWith("c:");
+    try {
+      Paths.get(path);
+    } catch (InvalidPathException | NullPointerException ex) {
+      return false;
+    }
+    return true;
   }
 
   private void showLocalFile(String path, SyncFile syncFile, ImageView targetImageView) {
-    Image image = new Image("file:///" + path + syncFile.getFile());
+    Image image = new Image("file:///" + path + "/" + syncFile.getFile());
     boolean error = image.isError();
     if (error) {
       log.error("Fehler beim Laden des Bildes");
