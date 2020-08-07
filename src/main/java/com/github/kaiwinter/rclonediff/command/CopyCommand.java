@@ -76,7 +76,7 @@ public class CopyCommand extends AbstractCommand {
   }
 
   private void copyFileFromTo(String file, String fromPath, Path toPath) throws IOException {
-    String command = "rclone copy " + fromPath + "/" + file + " " + toPath;
+    String command = "rclone copy \"" + fromPath + "/" + file + "\" \"" + toPath + "\"";
     log.info("Copy command: {}", command);
 
     Process process = runtime.exec(command);
