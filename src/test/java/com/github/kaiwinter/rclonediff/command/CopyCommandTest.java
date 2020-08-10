@@ -49,7 +49,7 @@ class CopyCommandTest {
     CopyCommand copyCommand = new CopyCommand(runtime, "Dropbox:/backup", syncFile, tempDirectory);
     copyCommand.createTask().run();
 
-    verify(runtime).exec(eq("rclone copy Dropbox:/backup/file.jpg c:" + File.separator + "systemp"));
+    verify(runtime).exec(eq("rclone copy \"Dropbox:/backup/file.jpg\" \"c:" + File.separator + "systemp\""));
   }
 
   /**
