@@ -56,6 +56,7 @@
                <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                  <RowConstraints fillHeight="false" vgrow="NEVER" />
                   <RowConstraints minHeight="200.0" prefHeight="200.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
@@ -65,8 +66,10 @@
                   <Label fx:id="sourceOnlyLabel" text="Source only" />
                   <Label fx:id="diffsLabel" text="Different content" GridPane.columnIndex="1" />
                   <Label fx:id="targetOnlyLabel" text="Target only" GridPane.columnIndex="2" />
-                  <ImageView fx:id="sourceOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2" />
-                  <ImageView fx:id="targetOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <ImageView fx:id="sourceOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3" />
+                  <ImageView fx:id="targetOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <Button fx:id="sourceDeleteFileButton" mnemonicParsing="false" onAction="#deleteSourceFile" text="Delete File" GridPane.rowIndex="2" />
+                  <Button fx:id="targetDeleteFileButton" mnemonicParsing="false" onAction="#deleteTargetFile" text="Delete File" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                </children>
             </GridPane>
          </children>

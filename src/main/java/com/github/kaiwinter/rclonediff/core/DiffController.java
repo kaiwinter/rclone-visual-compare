@@ -12,9 +12,10 @@ import org.apache.commons.io.FileUtils;
 
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
+import com.github.kaiwinter.rclonediff.command.DeleteCommand;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
-
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -78,6 +79,12 @@ public class DiffController implements Initializable {
   @FXML
   private Button diffButton;
 
+  @FXML
+  private Button sourceDeleteFileButton;
+
+  @FXML
+  private Button targetDeleteFileButton;
+
   private Path tempDirectory;
 
   @Override
@@ -95,6 +102,9 @@ public class DiffController implements Initializable {
       .addListener((observable, oldValue, newValue) -> showImageFromSourcePath(newValue));
     targetOnly.getSelectionModel().selectedItemProperty()
       .addListener((observable, oldValue, newValue) -> showImageFromTargetPath(newValue));
+
+    sourceDeleteFileButton.disableProperty().bind(Bindings.isEmpty(sourceOnly.getSelectionModel().getSelectedItems()));
+    targetDeleteFileButton.disableProperty().bind(Bindings.isEmpty(targetOnly.getSelectionModel().getSelectedItems()));
   }
 
   private void showImageFromSourcePath(SyncFile syncFile) {
@@ -169,6 +179,8 @@ public class DiffController implements Initializable {
     sourceOnly.disableProperty().bind(rcloneCheckService.runningProperty());
     targetOnly.disableProperty().bind(rcloneCheckService.runningProperty());
     diffs.disableProperty().bind(rcloneCheckService.runningProperty());
+    sourceDeleteFileButton.disableProperty().bind(rcloneCheckService.runningProperty());
+    targetDeleteFileButton.disableProperty().bind(rcloneCheckService.runningProperty());
 
     rcloneCheckService.setOnSucceeded(event -> {
       sourceOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInRemote()));
@@ -206,4 +218,23 @@ public class DiffController implements Initializable {
     }
   }
 
+  /**
+   * Deletes the selected file on the source side.
+   */
+  @FXML
+  public void deleteSourceFile() {
+    SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
+    DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), sourcePath.getText(), syncFile);
+    deleteCommand.start();
+  }
+
+  /**
+   * Deletes the selected file on the target side.
+   */
+  @FXML
+  public void deleteTargetFile() {
+    SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
+    DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), targetPath.getText(), syncFile);
+    deleteCommand.start();
+  }
 }
