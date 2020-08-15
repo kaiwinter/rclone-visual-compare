@@ -56,7 +56,7 @@ public class CopyCommand extends AbstractCommand {
   @Override
   protected void execute() throws IOException {
     // TODO: better filetype filter
-    if (!syncFile.getFile().endsWith(".jpg")) {
+    if (!syncFile.getFile().toLowerCase().endsWith(".jpg")) {
       // TODO: show placeholder
       this.loadedImage = null;
       return;
