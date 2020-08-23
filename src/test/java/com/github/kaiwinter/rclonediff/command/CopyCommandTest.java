@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,10 +42,9 @@ class CopyCommandTest {
   @Test
   void valid_command() throws IOException {
     Runtime runtime = mock(Runtime.class, Answers.RETURNS_MOCKS);
-    SyncFile syncFile = new SyncFile("file.jpg");
-    Path tempDirectory = Path.of("c:/systemp");
+    SyncFile syncFile = new SyncFile("Dropbox:/backup", "c:/systemp", "file.jpg");
 
-    CopyCommand copyCommand = new CopyCommand(runtime, "Dropbox:/backup", syncFile, tempDirectory);
+    CopyCommand copyCommand = new CopyCommand(runtime, syncFile);
     copyCommand.createTask().run();
 
     verify(runtime).exec(eq("rclone copy \"Dropbox:/backup/file.jpg\" \"c:" + File.separator + "systemp\""));
@@ -60,10 +58,9 @@ class CopyCommandTest {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(new byte[] {})).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    SyncFile syncFile = new SyncFile("file.jpg");
-    Path tempDirectory = Path.of("c:/systemp");
+    SyncFile syncFile = new SyncFile("Dropbox:/backup", "c:/systemp", "file.jpg");
 
-    CopyCommand copyCommand = new CopyCommand(runtime, "Dropbox:/backup", syncFile, tempDirectory);
+    CopyCommand copyCommand = new CopyCommand(runtime, syncFile);
     copyCommand.createTask().run();
 
     assertNotNull(copyCommand.getLoadedImage());

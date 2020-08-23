@@ -9,6 +9,16 @@ import lombok.Data;
 public class SyncFile {
 
   /**
+   * the source path as selected in the UI.
+   */
+  private final String sourcePath;
+
+  /**
+   * the target path as selected in the UI.
+   */
+  private final String targetPath;
+
+  /**
    * the file name, may contain path fragment
    */
   private final String file;

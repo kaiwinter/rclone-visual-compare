@@ -24,8 +24,6 @@ public class MainApplication extends Application {
     AnchorPane page = (AnchorPane) loader.load(getClass().getResourceAsStream("/RcloneDiff.fxml"));
     Scene scene = new Scene(page);
     controller = loader.getController();
-    controller.getSourcePath().setText("c:/temp/rclone-vs/2020/");
-    controller.getTargetPath().setText("DropboxTineCrypt:/2020/");
 
     // scene.getRoot().cursorProperty().bind(Bindings.when(service.runningProperty()).then(Cursor.WAIT).otherwise(Cursor.DEFAULT));
     // controller.getLocalPath().disableProperty().bind(service.runningProperty());

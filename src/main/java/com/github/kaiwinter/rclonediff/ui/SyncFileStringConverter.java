@@ -11,7 +11,7 @@ public class SyncFileStringConverter extends StringConverter<SyncFile> {
 
   @Override
   public String toString(SyncFile object) {
-    return object.toString();
+    return object.getFile();
   }
 
   @Override

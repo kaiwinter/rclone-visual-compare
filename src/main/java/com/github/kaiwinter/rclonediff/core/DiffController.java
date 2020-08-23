@@ -15,6 +15,7 @@ import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
+
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -87,6 +88,8 @@ public class DiffController implements Initializable {
 
   private Path tempDirectory;
 
+  private DiffModel model = new DiffModel();
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     sourceOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
@@ -105,6 +108,9 @@ public class DiffController implements Initializable {
 
     sourceDeleteFileButton.disableProperty().bind(Bindings.isEmpty(sourceOnly.getSelectionModel().getSelectedItems()));
     targetDeleteFileButton.disableProperty().bind(Bindings.isEmpty(targetOnly.getSelectionModel().getSelectedItems()));
+
+    sourcePath.textProperty().bind(model.getSource().getPath());
+    targetPath.textProperty().bind(model.getTarget().getPath());
   }
 
   private void showImageFromSourcePath(SyncFile syncFile) {
@@ -116,9 +122,9 @@ public class DiffController implements Initializable {
     String path = sourcePath.getText();
 
     if (isLocalPath(path)) {
-      showLocalFile(path, syncFile, sourceOnlyImage);
+      showLocalFile(syncFile.getSourcePath() + "/" + syncFile.getFile(), sourceOnlyImage);
     } else {
-      showRemoteFile(path, syncFile, sourceOnlyImage);
+      showRemoteFile(new SyncFile(syncFile.getSourcePath(), getTempDirectoryLazy().toString(), syncFile.getFile()), sourceOnlyImage);
     }
   }
 
@@ -131,9 +137,9 @@ public class DiffController implements Initializable {
     String path = targetPath.getText();
 
     if (isLocalPath(path)) {
-      showLocalFile(path, syncFile, targetOnlyImage);
+      showLocalFile(syncFile.getTargetPath() + "/" + syncFile.getFile(), targetOnlyImage);
     } else {
-      showRemoteFile(path, syncFile, targetOnlyImage);
+      showRemoteFile(new SyncFile(syncFile.getTargetPath(), getTempDirectoryLazy().toString(), syncFile.getFile()), targetOnlyImage);
     }
   }
 
@@ -146,8 +152,8 @@ public class DiffController implements Initializable {
     return true;
   }
 
-  private void showLocalFile(String path, SyncFile syncFile, ImageView targetImageView) {
-    Image image = new Image("file:///" + path + "/" + syncFile.getFile());
+  private void showLocalFile(String absoluteFilename, ImageView targetImageView) {
+    Image image = new Image("file:///" + absoluteFilename);
     boolean error = image.isError();
     if (error) {
       log.error("Fehler beim Laden des Bildes");
@@ -155,8 +161,8 @@ public class DiffController implements Initializable {
     targetImageView.setImage(image);
   }
 
-  private void showRemoteFile(String path, SyncFile syncFile, ImageView targetImageView) {
-    CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), path, syncFile, getTempDirectoryLazy());
+  private void showRemoteFile(SyncFile syncFile, ImageView targetImageView) {
+    CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), syncFile);
     rcloneCopyService.setOnSucceeded(event -> {
       if (rcloneCopyService.isLatestCopyCommand()) {
         targetImageView.setImage(rcloneCopyService.getLoadedImage());
@@ -168,7 +174,7 @@ public class DiffController implements Initializable {
 
   @FXML
   public void diff() {
-    CheckCommand rcloneCheckService = new CheckCommand(Runtime.getRuntime(), sourcePath.getText(), targetPath.getText());
+    CheckCommand rcloneCheckService = new CheckCommand(Runtime.getRuntime(), model.getSource(), model.getTarget());
 
     // scene.getRoot().cursorProperty().bind(Bindings.when(rcloneCheckService.runningProperty()).then(Cursor.WAIT).otherwise(Cursor.DEFAULT));
     sourcePath.disableProperty().bind(rcloneCheckService.runningProperty());
@@ -183,13 +189,13 @@ public class DiffController implements Initializable {
     targetDeleteFileButton.disableProperty().bind(rcloneCheckService.runningProperty());
 
     rcloneCheckService.setOnSucceeded(event -> {
-      sourceOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInRemote()));
+      sourceOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInTarget()));
       diffs.setItems(FXCollections.observableArrayList(rcloneCheckService.getSizeDiffer()));
-      targetOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInLocal()));
+      targetOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInSource()));
 
-      sourceOnlyLabel.setText("Local only (" + rcloneCheckService.getNotInRemote().size() + ")");
+      sourceOnlyLabel.setText("Local only (" + rcloneCheckService.getNotInSource().size() + ")");
       diffsLabel.setText("Different content (" + rcloneCheckService.getSizeDiffer().size() + ")");
-      targetOnlyLabel.setText("Remote only (" + rcloneCheckService.getNotInLocal().size() + ")");
+      targetOnlyLabel.setText("Remote only (" + rcloneCheckService.getNotInTarget().size() + ")");
     });
     rcloneCheckService.start();
   }
@@ -224,7 +230,7 @@ public class DiffController implements Initializable {
   @FXML
   public void deleteSourceFile() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
-    DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), sourcePath.getText(), syncFile);
+    DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), sourcePath.getText() + "/" + syncFile.getFile());
     deleteCommand.start();
   }
 
@@ -234,7 +240,7 @@ public class DiffController implements Initializable {
   @FXML
   public void deleteTargetFile() {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
-    DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), targetPath.getText(), syncFile);
+    DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), targetPath.getText() + "/" + syncFile.getFile());
     deleteCommand.start();
   }
 }

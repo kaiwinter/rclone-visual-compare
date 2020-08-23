@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.application.Platform;
@@ -49,7 +50,8 @@ class CheckCommandTest {
   void valid_command() throws IOException {
     Runtime runtime = mock(Runtime.class, Answers.RETURNS_MOCKS);
 
-    CheckCommand checkCommand = new CheckCommand(runtime, "c:/temp/", "Dropbox:/backup");
+    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
+      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
     checkCommand.createTask().run();
 
     verify(runtime).exec(eq("rclone check c:/temp/ Dropbox:/backup"));
@@ -65,14 +67,15 @@ class CheckCommandTest {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    CheckCommand checkCommand = new CheckCommand(runtime, "c:/temp/", "Dropbox:/backup/");
+    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
+      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
     Task<Void> task = checkCommand.createTask();
     task.run();
     Platform.runLater(() -> assertNull(task.getException()));
 
-    assertTrue(checkCommand.getNotInRemote().isEmpty());
+    assertTrue(checkCommand.getNotInTarget().isEmpty());
     assertTrue(checkCommand.getSizeDiffer().isEmpty());
-    List<SyncFile> notInLocal = checkCommand.getNotInLocal();
+    List<SyncFile> notInLocal = checkCommand.getNotInSource();
     assertEquals(1, notInLocal.size());
 
     SyncFile syncFile = notInLocal.get(0);
@@ -91,14 +94,15 @@ class CheckCommandTest {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    CheckCommand checkCommand = new CheckCommand(runtime, "c:/temp/", "Dropbox:/backup/");
+    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
+      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup/"));
     Task<Void> task = checkCommand.createTask();
     task.run();
     Platform.runLater(() -> assertNull(task.getException()));
 
-    assertTrue(checkCommand.getNotInLocal().isEmpty());
+    assertTrue(checkCommand.getNotInSource().isEmpty());
     assertTrue(checkCommand.getSizeDiffer().isEmpty());
-    List<SyncFile> notInRemote = checkCommand.getNotInRemote();
+    List<SyncFile> notInRemote = checkCommand.getNotInTarget();
     assertEquals(1, notInRemote.size());
 
     SyncFile syncFile = notInRemote.get(0);
@@ -117,13 +121,14 @@ class CheckCommandTest {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    CheckCommand checkCommand = new CheckCommand(runtime, "c:/temp/", "Dropbox:/backup/");
+    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
+      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
     Task<Void> task = checkCommand.createTask();
     task.run();
     Platform.runLater(() -> assertNull(task.getException()));
 
-    assertTrue(checkCommand.getNotInLocal().isEmpty());
-    assertTrue(checkCommand.getNotInLocal().isEmpty());
+    assertTrue(checkCommand.getNotInSource().isEmpty());
+    assertTrue(checkCommand.getNotInTarget().isEmpty());
 
     List<SyncFile> sizeDiffer = checkCommand.getSizeDiffer();
     assertEquals(1, sizeDiffer.size());
@@ -135,17 +140,19 @@ class CheckCommandTest {
   }
 
   /**
-   * Tests if an Exception is thrown if the rclone summary tells a different number of differences than the number which
-   * were parsed.
+   * Tests if an Exception is thrown if the rclone summary tells a different number of differences
+   * than the number which were parsed.
    */
   @Test
   void parsed_too_less() throws IOException, InterruptedException, ExecutionException {
-    String rcloneOutput = "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: Sizes differ\r\n2020/05/26 15:17:07 NOTICE: Encrypted drive 'Dropbox:/backup/': 2 differences found";
+    String rcloneOutput =
+      "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: Sizes differ\r\n2020/05/26 15:17:07 NOTICE: Encrypted drive 'Dropbox:/backup/': 2 differences found";
 
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    CheckCommand checkCommand = new CheckCommand(runtime, "c:/temp/", "Dropbox:/backup/");
+    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
+      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
     Task<Void> task = checkCommand.createTask();
     task.run();
 
@@ -157,8 +164,8 @@ class CheckCommandTest {
     Throwable data = futureTask.get();
     assertNotNull(data);
 
-    assertTrue(checkCommand.getNotInLocal().isEmpty());
-    assertTrue(checkCommand.getNotInLocal().isEmpty());
+    assertTrue(checkCommand.getNotInSource().isEmpty());
+    assertTrue(checkCommand.getNotInTarget().isEmpty());
 
     List<SyncFile> sizeDiffer = checkCommand.getSizeDiffer();
     assertEquals(1, sizeDiffer.size());

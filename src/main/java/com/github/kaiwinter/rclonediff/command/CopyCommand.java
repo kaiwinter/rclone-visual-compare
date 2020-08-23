@@ -27,29 +27,23 @@ public class CopyCommand extends AbstractCommand {
 
   private final Runtime runtime;
   private final SyncFile syncFile;
-  private final Path tempDirectory;
 
   @Getter
   private Image loadedImage;
-
-  private String path;
 
   /**
    * Constructs a new {@link CopyCommand}.
    * 
    * @param runtime
    *          the {@link Runnable} to execute the rclone command
-   * @param path
    * @param syncFile
    *          the {@link SyncFile} which contains informations about the file which should be copied.
    * @param tempDirectory
    *          directory to store temporary files
    */
-  public CopyCommand(Runtime runtime, String path, SyncFile syncFile, Path tempDirectory) {
+  public CopyCommand(Runtime runtime, SyncFile syncFile) {
     this.runtime = runtime;
-    this.path = path;
     this.syncFile = syncFile;
-    this.tempDirectory = tempDirectory;
     CopyCommand.setLatest(this);
   }
 
@@ -62,9 +56,9 @@ public class CopyCommand extends AbstractCommand {
       return;
     }
 
-    Path completeFilePath = tempDirectory.resolve(syncFile.getFile());
+    Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
     if (!completeFilePath.toFile().exists()) {
-      copyFileFromTo(syncFile.getFile(), path, completeFilePath.getParent());
+      copyFileFromTo(syncFile.getFile(), syncFile.getSourcePath(), completeFilePath.getParent());
     }
 
     URI filename = completeFilePath.toUri();

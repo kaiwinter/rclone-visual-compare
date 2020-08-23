@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-import com.github.kaiwinter.rclonediff.model.SyncFile;
 import javafx.application.Platform;
 
 /**
@@ -34,7 +33,7 @@ class DeleteCommandTest {
   void valid_command() throws IOException {
     Runtime runtime = mock(Runtime.class, Answers.RETURNS_MOCKS);
 
-    DeleteCommand deleteCommand = new DeleteCommand(runtime, "Dropbox:/backup", new SyncFile("file1"));
+    DeleteCommand deleteCommand = new DeleteCommand(runtime, "Dropbox:/backup/file1");
     deleteCommand.createTask().run();
 
     verify(runtime).exec(eq("rclone delete \"Dropbox:/backup/file1\""));
