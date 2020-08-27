@@ -16,4 +16,3 @@ More to come.
 - TECHNICAL
   - refresh after delete (list and counter)
   - use lsjon instead of check (re-implement matching)?
-  - async image creation (`new Image(file, true)`)

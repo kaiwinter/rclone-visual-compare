@@ -63,10 +63,8 @@ public class CopyCommand extends AbstractCommand {
 
     URI filename = completeFilePath.toUri();
 
-    this.loadedImage = new Image(filename.toString());
-    if (this.loadedImage.isError()) {
-      log.error("Fehler beim Laden des Bildes");
-    }
+    this.loadedImage = new Image(filename.toString(), true);
+    this.loadedImage.exceptionProperty().addListener((observable, oldValue, newValue) -> log.error(newValue.getMessage()));
   }
 
   private void copyFileFromTo(String file, String fromPath, Path toPath) throws IOException {
