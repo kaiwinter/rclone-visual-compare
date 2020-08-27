@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import com.github.kaiwinter.rclonediff.core.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
@@ -50,8 +51,11 @@ class CheckCommandTest {
   void valid_command() throws IOException {
     Runtime runtime = mock(Runtime.class, Answers.RETURNS_MOCKS);
 
-    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
-      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    DiffModel model = new DiffModel();
+    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+
+    CheckCommand checkCommand = new CheckCommand(runtime, model);
     checkCommand.createTask().run();
 
     verify(runtime).exec(eq("rclone check c:/temp/ Dropbox:/backup"));
@@ -67,21 +71,24 @@ class CheckCommandTest {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
-      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    DiffModel model = new DiffModel();
+    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+
+    CheckCommand checkCommand = new CheckCommand(runtime, model);
     Task<Void> task = checkCommand.createTask();
     task.run();
     Platform.runLater(() -> assertNull(task.getException()));
 
-    assertTrue(checkCommand.getNotInTarget().isEmpty());
-    assertTrue(checkCommand.getSizeDiffer().isEmpty());
-    List<SyncFile> notInLocal = checkCommand.getNotInSource();
+    assertTrue(model.getSourceOnly().isEmpty());
+    assertTrue(model.getContentDifferent().isEmpty());
+    List<SyncFile> notInLocal = model.getTargetOnly();
     assertEquals(1, notInLocal.size());
 
     SyncFile syncFile = notInLocal.get(0);
     assertEquals("20200501_081347.mp4", syncFile.getFile());
-    // assertEquals("c:/temp/", syncFile.getLocalPath());
-    // assertEquals("Dropbox:/backup/", syncFile.getRemotePath());
+    assertEquals("c:/temp/", syncFile.getSourcePath());
+    assertEquals("Dropbox:/backup", syncFile.getTargetPath());
   }
 
   /**
@@ -89,26 +96,29 @@ class CheckCommandTest {
    */
   @Test
   void not_in_remote() throws IOException {
-    String rcloneOutput = "2020/05/26 15:17:05 ERROR : 20200201_090433.jpg: File not in Encrypted drive 'Dropbox:/backup/'";
+    String rcloneOutput = "2020/05/26 15:17:05 ERROR : 20200201_090433.jpg: File not in Encrypted drive 'Dropbox:/backup'";
 
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
-      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup/"));
+    DiffModel model = new DiffModel();
+    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+
+    CheckCommand checkCommand = new CheckCommand(runtime, model);
     Task<Void> task = checkCommand.createTask();
     task.run();
     Platform.runLater(() -> assertNull(task.getException()));
 
-    assertTrue(checkCommand.getNotInSource().isEmpty());
-    assertTrue(checkCommand.getSizeDiffer().isEmpty());
-    List<SyncFile> notInRemote = checkCommand.getNotInTarget();
+    assertTrue(model.getTargetOnly().isEmpty());
+    assertTrue(model.getContentDifferent().isEmpty());
+    List<SyncFile> notInRemote = model.getSourceOnly();
     assertEquals(1, notInRemote.size());
 
     SyncFile syncFile = notInRemote.get(0);
     assertEquals("20200201_090433.jpg", syncFile.getFile());
-    // assertEquals("c:/temp/", syncFile.getLocalPath());
-    // assertEquals("Dropbox:/backup/", syncFile.getRemotePath());
+    assertEquals("c:/temp/", syncFile.getSourcePath());
+    assertEquals("Dropbox:/backup", syncFile.getTargetPath());
   }
 
   /**
@@ -121,22 +131,25 @@ class CheckCommandTest {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
-      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    DiffModel model = new DiffModel();
+    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+
+    CheckCommand checkCommand = new CheckCommand(runtime, model);
     Task<Void> task = checkCommand.createTask();
     task.run();
     Platform.runLater(() -> assertNull(task.getException()));
 
-    assertTrue(checkCommand.getNotInSource().isEmpty());
-    assertTrue(checkCommand.getNotInTarget().isEmpty());
+    assertTrue(model.getTargetOnly().isEmpty());
+    assertTrue(model.getSourceOnly().isEmpty());
 
-    List<SyncFile> sizeDiffer = checkCommand.getSizeDiffer();
+    List<SyncFile> sizeDiffer = model.getContentDifferent();
     assertEquals(1, sizeDiffer.size());
 
     SyncFile syncFile = sizeDiffer.get(0);
     assertEquals("20200108_184311.jpg", syncFile.getFile());
-    // assertEquals("c:/temp/", syncFile.getLocalPath());
-    // assertEquals("Dropbox:/backup/", syncFile.getRemotePath());
+    assertEquals("c:/temp/", syncFile.getSourcePath());
+    assertEquals("Dropbox:/backup", syncFile.getTargetPath());
   }
 
   /**
@@ -146,13 +159,16 @@ class CheckCommandTest {
   @Test
   void parsed_too_less() throws IOException, InterruptedException, ExecutionException {
     String rcloneOutput =
-      "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: Sizes differ\r\n2020/05/26 15:17:07 NOTICE: Encrypted drive 'Dropbox:/backup/': 2 differences found";
+      "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: Sizes differ\r\n2020/05/26 15:17:07 NOTICE: Encrypted drive 'Dropbox:/backup': 2 differences found";
 
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    CheckCommand checkCommand = new CheckCommand(runtime, new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"),
-      new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    DiffModel model = new DiffModel();
+    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+
+    CheckCommand checkCommand = new CheckCommand(runtime, model);
     Task<Void> task = checkCommand.createTask();
     task.run();
 
@@ -164,16 +180,16 @@ class CheckCommandTest {
     Throwable data = futureTask.get();
     assertNotNull(data);
 
-    assertTrue(checkCommand.getNotInSource().isEmpty());
-    assertTrue(checkCommand.getNotInTarget().isEmpty());
+    assertTrue(model.getTargetOnly().isEmpty());
+    assertTrue(model.getSourceOnly().isEmpty());
 
-    List<SyncFile> sizeDiffer = checkCommand.getSizeDiffer();
+    List<SyncFile> sizeDiffer = model.getContentDifferent();
     assertEquals(1, sizeDiffer.size());
 
     SyncFile syncFile = sizeDiffer.get(0);
     assertEquals("20200108_184311.jpg", syncFile.getFile());
-    // assertEquals("c:/temp/", syncFile.getLocalPath());
-    // assertEquals("Dropbox:/backup/", syncFile.getRemotePath());
+    assertEquals("c:/temp/", syncFile.getSourcePath());
+    assertEquals("Dropbox:/backup", syncFile.getTargetPath());
   }
 
 }

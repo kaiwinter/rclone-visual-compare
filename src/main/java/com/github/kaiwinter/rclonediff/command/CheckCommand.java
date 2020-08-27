@@ -3,16 +3,15 @@ package com.github.kaiwinter.rclonediff.command;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.kaiwinter.rclonediff.core.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
-import lombok.Getter;
+import javafx.application.Platform;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,21 +28,13 @@ public class CheckCommand extends AbstractCommand {
   private static final Pattern NUMBER_OF_DIFFERENCES = Pattern.compile(".* (.*) differences found");
 
   private final Runtime runtime;
-  private final SyncEndpoint source;
-  private final SyncEndpoint target;
-
-
-  @Getter
-  private List<SyncFile> sizeDiffer = new ArrayList<>();
-
-  @Getter
-  private List<SyncFile> notInSource = new ArrayList<>();
-
-  @Getter
-  private List<SyncFile> notInTarget = new ArrayList<>();
+  private final DiffModel model;
 
   @Override
   protected void execute() throws IOException {
+    SyncEndpoint source = model.getSource();
+    SyncEndpoint target = model.getTarget();
+
     String command = "rclone check " + source.getPath().getValue() + " " + target.getPath().getValue();
     log.info("Check command: {}", command);
 
@@ -75,21 +66,29 @@ public class CheckCommand extends AbstractCommand {
 
 
       if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
-        sizeDiffer.add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), matcher.group(1)));
+        final Matcher m = matcher;
+        Platform.runLater(
+          () -> model.getContentDifferent().add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), m.group(1))));
         log.info(line + " (differences)");
 
       } else if ((matcher = sourcePattern.matcher(line)).matches()) {
-        notInSource.add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), matcher.group(1)));
+
+        final Matcher m = matcher;
+        Platform
+          .runLater(() -> model.getTargetOnly().add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), m.group(1))));
         log.info(line + " (missing in source)");
 
       } else if ((matcher = targetPattern.matcher(line)).matches()) {
-        notInTarget.add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), matcher.group(1)));
+
+        final Matcher m = matcher;
+        Platform
+          .runLater(() -> model.getSourceOnly().add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), m.group(1))));
         log.info(line + " (missing in target)");
 
       } else if ((matcher = NUMBER_OF_DIFFERENCES.matcher(line)).matches()) {
         log.info(line + " (summary check)");
         long expectedEntries = Long.valueOf(matcher.group(1));
-        long actualEntries = sizeDiffer.size() + notInSource.size() + notInTarget.size();
+        long actualEntries = model.getContentDifferent().size() + model.getSourceOnly().size() + model.getTargetOnly().size();
         if (expectedEntries != actualEntries) {
           String message = "Excepted " + expectedEntries + " parsed differences, actually parsed: " + actualEntries;
           log.error(message);

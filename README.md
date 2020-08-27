@@ -7,7 +7,6 @@ More to come.
 ## TODO
 - FEATURES
   - Cancel for diff
-  - Reactive diff
   - Export of the result
   - transfer from source <-> target
   - Sorter/formatter for lists (SyncFile-Object)
@@ -17,3 +16,4 @@ More to come.
 - TECHNICAL
   - refresh after delete (list and counter)
   - use lsjon instead of check (re-implement matching)?
+  - async image creation (`new Image(file, true)`)

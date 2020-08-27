@@ -17,12 +17,12 @@ import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
 import javafx.beans.binding.Bindings;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
@@ -86,6 +86,9 @@ public class DiffController implements Initializable {
   @FXML
   private Button targetDeleteFileButton;
 
+  @FXML
+  private ProgressIndicator progressIndicator;
+
   private Path tempDirectory;
 
   private DiffModel model = new DiffModel();
@@ -111,6 +114,10 @@ public class DiffController implements Initializable {
 
     sourcePath.textProperty().bind(model.getSource().getPath());
     targetPath.textProperty().bind(model.getTarget().getPath());
+
+    sourceOnly.setItems(model.getSourceOnly());
+    diffs.setItems(model.getContentDifferent());
+    targetOnly.setItems(model.getTargetOnly());
   }
 
   private void showImageFromSourcePath(SyncFile syncFile) {
@@ -153,7 +160,7 @@ public class DiffController implements Initializable {
   }
 
   private void showLocalFile(String absoluteFilename, ImageView targetImageView) {
-    Image image = new Image("file:///" + absoluteFilename);
+    Image image = new Image("file:///" + absoluteFilename/* , true */);
     boolean error = image.isError();
     if (error) {
       log.error("Fehler beim Laden des Bildes");
@@ -174,28 +181,25 @@ public class DiffController implements Initializable {
 
   @FXML
   public void diff() {
-    CheckCommand rcloneCheckService = new CheckCommand(Runtime.getRuntime(), model.getSource(), model.getTarget());
+    model.getSourceOnly().clear();
+    model.getContentDifferent().clear();
+    model.getTargetOnly().clear();
 
-    // scene.getRoot().cursorProperty().bind(Bindings.when(rcloneCheckService.runningProperty()).then(Cursor.WAIT).otherwise(Cursor.DEFAULT));
+    CheckCommand rcloneCheckService = new CheckCommand(Runtime.getRuntime(), model);
+
     sourcePath.disableProperty().bind(rcloneCheckService.runningProperty());
     targetPath.disableProperty().bind(rcloneCheckService.runningProperty());
     sourceChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
     targetChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
     diffButton.disableProperty().bind(rcloneCheckService.runningProperty());
-    sourceOnly.disableProperty().bind(rcloneCheckService.runningProperty());
-    targetOnly.disableProperty().bind(rcloneCheckService.runningProperty());
-    diffs.disableProperty().bind(rcloneCheckService.runningProperty());
+    progressIndicator.visibleProperty().bind(rcloneCheckService.runningProperty());
     sourceDeleteFileButton.disableProperty().bind(rcloneCheckService.runningProperty());
     targetDeleteFileButton.disableProperty().bind(rcloneCheckService.runningProperty());
 
     rcloneCheckService.setOnSucceeded(event -> {
-      sourceOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInTarget()));
-      diffs.setItems(FXCollections.observableArrayList(rcloneCheckService.getSizeDiffer()));
-      targetOnly.setItems(FXCollections.observableArrayList(rcloneCheckService.getNotInSource()));
-
-      sourceOnlyLabel.setText("Local only (" + rcloneCheckService.getNotInSource().size() + ")");
-      diffsLabel.setText("Different content (" + rcloneCheckService.getSizeDiffer().size() + ")");
-      targetOnlyLabel.setText("Remote only (" + rcloneCheckService.getNotInTarget().size() + ")");
+      sourceOnlyLabel.setText("Local only (" + sourceOnly.getItems().size() + ")");
+      diffsLabel.setText("Different content (" + diffs.getItems().size() + ")");
+      targetOnlyLabel.setText("Remote only (" + targetOnly.getItems().size() + ")");
     });
     rcloneCheckService.start();
   }
