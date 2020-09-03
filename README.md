@@ -8,7 +8,6 @@ More to come.
 - FEATURES
   - Cancel for diff
   - Export of the result
-  - transfer from source <-> target
   - Sorter/formatter for lists (SyncFile-Object)
   - click preview image for large view
   - show preview for different file types than jpg
@@ -16,3 +15,4 @@ More to come.
 - TECHNICAL
   - refresh after delete (list and counter)
   - use lsjon instead of check (re-implement matching)?
+  - Tree instead of ListView

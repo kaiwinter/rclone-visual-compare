@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
@@ -71,8 +72,18 @@
                   <Label fx:id="targetOnlyLabel" text="Target only" GridPane.columnIndex="2" />
                   <ImageView fx:id="sourceOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3" />
                   <ImageView fx:id="targetOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                  <Button fx:id="sourceDeleteFileButton" mnemonicParsing="false" onAction="#deleteSourceFile" text="Delete File" GridPane.rowIndex="2" />
-                  <Button fx:id="targetDeleteFileButton" mnemonicParsing="false" onAction="#deleteTargetFile" text="Delete File" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <HBox spacing="10.0" GridPane.rowIndex="2">
+                     <children>
+                        <Button fx:id="sourceDeleteFileButton" mnemonicParsing="false" onAction="#deleteSourceFile" text="Delete File" />
+                        <Button fx:id="copyToTargetButton" mnemonicParsing="false" onAction="#copyToTarget" text="Copy to Target" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="10.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                     <children>
+                        <Button fx:id="targetDeleteFileButton" mnemonicParsing="false" onAction="#deleteTargetFile" text="Delete File" />
+                        <Button fx:id="copyToSourceButton" mnemonicParsing="false" onAction="#copyToSource" text="Copy to Source" />
+                     </children>
+                  </HBox>
                </children>
             </GridPane>
          </children>

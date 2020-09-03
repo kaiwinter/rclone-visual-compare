@@ -14,11 +14,14 @@ import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
+import com.github.kaiwinter.rclonediff.ui.AlertDialogBuilder;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -87,11 +90,19 @@ public class DiffController implements Initializable {
   private Button targetDeleteFileButton;
 
   @FXML
+  private Button copyToTargetButton;
+
+  @FXML
+  private Button copyToSourceButton;
+
+  @FXML
   private ProgressIndicator progressIndicator;
 
   private Path tempDirectory;
 
   private DiffModel model = new DiffModel();
+
+  private CopyCommand latestCopyCommand;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -111,6 +122,9 @@ public class DiffController implements Initializable {
 
     sourceDeleteFileButton.disableProperty().bind(Bindings.isEmpty(sourceOnly.getSelectionModel().getSelectedItems()));
     targetDeleteFileButton.disableProperty().bind(Bindings.isEmpty(targetOnly.getSelectionModel().getSelectedItems()));
+
+    copyToTargetButton.disableProperty().bind(Bindings.isEmpty(sourceOnly.getSelectionModel().getSelectedItems()));
+    copyToSourceButton.disableProperty().bind(Bindings.isEmpty(targetOnly.getSelectionModel().getSelectedItems()));
 
     sourcePath.textProperty().bind(model.getSource().getPath());
     targetPath.textProperty().bind(model.getTarget().getPath());
@@ -169,12 +183,14 @@ public class DiffController implements Initializable {
   private void showRemoteFile(SyncFile syncFile, ImageView targetImageView) {
     CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), syncFile);
     rcloneCopyService.setOnSucceeded(event -> {
-      if (rcloneCopyService.isLatestCopyCommand()) {
+
+      if (rcloneCopyService == latestCopyCommand) {
         targetImageView.setImage(rcloneCopyService.getLoadedImage());
         event.consume();
       }
     });
     rcloneCopyService.start();
+    latestCopyCommand = rcloneCopyService;
   }
 
   @FXML
@@ -244,5 +260,49 @@ public class DiffController implements Initializable {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), targetPath.getText() + "/" + syncFile.getFile());
     deleteCommand.start();
+  }
+
+  @FXML
+  public void copyToTarget() {
+    SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
+    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFile);
+    copyCommand.setOnSucceeded(event -> {
+      if (copyCommand.getReturnCode() == 0) {
+        model.getSourceOnly().remove(syncFile);
+        sourceOnly.getSelectionModel().clearSelection();
+      } else {
+        Alert alert = AlertDialogBuilder.buildLogDialog(copyCommand.getConsoleLog());
+        alert.setTitle("Error running rclone command");
+        alert.setHeaderText("Unexpected rclone return code: " + copyCommand.getReturnCode());
+        alert.setContentText("See details for rclone command and rclone console output");
+
+        Platform.runLater(() -> alert.showAndWait());
+      }
+      event.consume();
+    });
+    copyCommand.start();
+  }
+
+  @FXML
+  public void copyToSource() {
+    SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
+    SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
+    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFileInverse);
+    copyCommand.setOnSucceeded(event -> {
+
+      if (copyCommand.getReturnCode() == 0) {
+        model.getTargetOnly().remove(syncFile);
+        targetOnly.getSelectionModel().clearSelection();
+      } else {
+        Alert alert = AlertDialogBuilder.buildLogDialog(copyCommand.getConsoleLog());
+        alert.setTitle("Error running rclone command");
+        alert.setHeaderText("Unexpected rclone return code: " + copyCommand.getReturnCode());
+        alert.setContentText("See details for rclone command and rclone console output");
+
+        Platform.runLater(() -> alert.showAndWait());
+      }
+      event.consume();
+    });
+    copyCommand.start();
   }
 }
