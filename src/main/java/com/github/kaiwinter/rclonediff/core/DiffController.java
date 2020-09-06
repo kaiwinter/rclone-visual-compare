@@ -178,6 +178,11 @@ public class DiffController implements Initializable {
   }
 
   private void showLocalFile(String absoluteFilename, ImageView targetImageView) {
+    Image currentImage = targetImageView.getImage();
+    if (currentImage != null) {
+      currentImage.cancel();
+    }
+
     Image image = new Image("file:///" + absoluteFilename, true);
     image.progressProperty().addListener((observable, oldValue, newValue) -> log.trace("Progress: " + newValue.doubleValue() * 100 + "%"));
     image.exceptionProperty().addListener((observable, oldValue, newValue) -> log.error(newValue.getMessage()));
