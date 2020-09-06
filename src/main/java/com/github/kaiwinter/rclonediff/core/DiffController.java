@@ -20,6 +20,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -28,6 +29,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,6 +104,7 @@ public class DiffController implements Initializable {
   private DiffModel model = new DiffModel();
 
   private CopyCommand latestCopyCommand;
+
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -291,5 +295,31 @@ public class DiffController implements Initializable {
       targetOnly.getSelectionModel().clearSelection();
     }));
     copyCommand.start();
+  }
+
+  @FXML
+  public void showSourceImageLarge() {
+    showImageLarge(sourceOnlyImage.getImage());
+  }
+
+  @FXML
+  public void showTargetImageLarge() {
+    showImageLarge(targetOnlyImage.getImage());
+  }
+
+  private void showImageLarge(Image image) {
+    StackPane root = new StackPane();
+
+    Stage stage = new Stage();
+    stage.setTitle(image.getUrl());
+    stage.setScene(new Scene(root, 800, 600));
+
+    ImageView imageView = new ImageView(image);
+    imageView.setPreserveRatio(true);
+    imageView.fitHeightProperty().bind(stage.heightProperty());
+    imageView.fitWidthProperty().bind(stage.widthProperty());
+    root.getChildren().add(imageView);
+
+    stage.show();
   }
 }

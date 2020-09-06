@@ -70,8 +70,8 @@
                   <Label fx:id="sourceOnlyLabel" text="Source only" />
                   <Label fx:id="diffsLabel" text="Different content" GridPane.columnIndex="1" />
                   <Label fx:id="targetOnlyLabel" text="Target only" GridPane.columnIndex="2" />
-                  <ImageView fx:id="sourceOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3" />
-                  <ImageView fx:id="targetOnlyImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <ImageView fx:id="sourceOnlyImage" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#showSourceImageLarge" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3" />
+                  <ImageView fx:id="targetOnlyImage" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#showTargetImageLarge" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                   <HBox spacing="10.0" GridPane.rowIndex="2">
                      <children>
                         <Button fx:id="sourceDeleteFileButton" mnemonicParsing="false" onAction="#deleteSourceFile" text="Delete File" />
