@@ -66,10 +66,10 @@ public class CheckCommand extends AbstractCommand {
       if (isCancelled) {
         break;
       }
+      consoleLog.add(line);
       Matcher matcher;
 
       if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
-        consoleLog.add(line);
         final Matcher m = matcher;
         Platform.runLater(
           () -> model.getContentDifferent().add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), m.group(1))));
