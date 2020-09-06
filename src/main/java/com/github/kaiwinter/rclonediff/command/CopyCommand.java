@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
@@ -24,15 +22,6 @@ public class CopyCommand extends AbstractCommand {
 
   private final Runtime runtime;
   private final SyncFile syncFile;
-
-  /**
-   * Return code of the rclone command.
-   */
-  @Getter
-  private int returnCode;
-
-  @Getter
-  private List<String> consoleLog = new ArrayList<>();
 
   // FIXME KW: Copy command should not have this parameter, this should be refactored
   @Getter
@@ -75,5 +64,10 @@ public class CopyCommand extends AbstractCommand {
 
     returnCode = process.exitValue();
     log.info("rclone return code: {}", returnCode);
+  }
+
+  @Override
+  public int[] getExpectedReturnCodes() {
+    return new int[] {0};
   }
 }

@@ -25,7 +25,6 @@ public class CheckCommand extends AbstractCommand {
   private static final Pattern SIZES_DIFFER = Pattern.compile(".*ERROR : (.*): Sizes differ");
   private static final String NOT_IN_LOCAL = ".*ERROR : (.*): File not in Local file system at \\/\\/\\?\\/{0}";
   private static final String NOT_IN_REMOTE = ".*ERROR : (.*): File not in .*'{0}'";
-  private static final Pattern NUMBER_OF_DIFFERENCES = Pattern.compile(".* (.*) differences found");
 
   private final Runtime runtime;
   private final DiffModel model;
@@ -37,6 +36,7 @@ public class CheckCommand extends AbstractCommand {
 
     String command = "rclone check " + source.getPath().getValue() + " " + target.getPath().getValue();
     log.info("Check command: {}", command);
+    consoleLog.add(command);
 
     Process process = runtime.exec(command);
     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -64,8 +64,8 @@ public class CheckCommand extends AbstractCommand {
     while ((line = reader.readLine()) != null) {
       Matcher matcher;
 
-
       if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
+        consoleLog.add(line);
         final Matcher m = matcher;
         Platform.runLater(
           () -> model.getContentDifferent().add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), m.group(1))));
@@ -85,21 +85,20 @@ public class CheckCommand extends AbstractCommand {
           .runLater(() -> model.getSourceOnly().add(new SyncFile(source.getPath().getValue(), target.getPath().getValue(), m.group(1))));
         log.info(line + " (missing in target)");
 
-      } else if ((matcher = NUMBER_OF_DIFFERENCES.matcher(line)).matches()) {
-        log.info(line + " (summary check)");
-        long expectedEntries = Long.valueOf(matcher.group(1));
-        long actualEntries = model.getContentDifferent().size() + model.getSourceOnly().size() + model.getTargetOnly().size();
-        if (expectedEntries != actualEntries) {
-          String message = "Excepted " + expectedEntries + " parsed differences, actually parsed: " + actualEntries;
-          log.error(message);
-          throw new AssertionError(message);
-        }
       } else {
         log.info(line + " (unrecognized)");
       }
     }
 
     wait(process);
-    log.debug("check value code {}", process.exitValue());
+    returnCode = process.exitValue();
+    log.info("rclone return code: {}", returnCode);
+  }
+
+  @Override
+  public int[] getExpectedReturnCodes() {
+    return new int[] {0, // source and target equal
+        1 // source and target not equal
+    };
   }
 }

@@ -26,13 +26,24 @@ public class AlertDialogBuilder {
     return buildDetailsDialog(logText);
   }
 
-  public static Alert buildExceptionDialog(Exception exception) {
+  /**
+   * Creates an {@link Alert} dialog which contains an exception.
+   *
+   * @param throwable
+   *          the exception to show
+   * @return an {@link Alert} instance which may be shown or further customized
+   */
+  public static Alert buildExceptionDialog(Throwable throwable) {
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
-    exception.printStackTrace(pw);
+    throwable.printStackTrace(pw);
     String exceptionText = sw.toString();
 
-    return buildDetailsDialog(exceptionText);
+    Alert alert = buildDetailsDialog(exceptionText);
+    alert.setTitle("Error running rclone command");
+    alert.setHeaderText("Caught an exception: " + throwable.getMessage());
+    alert.setContentText("See details for full stacktrace");
+    return alert;
   }
 
   private static Alert buildDetailsDialog(String details) {

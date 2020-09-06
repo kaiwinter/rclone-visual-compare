@@ -14,14 +14,12 @@ import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
-import com.github.kaiwinter.rclonediff.ui.AlertDialogBuilder;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -120,11 +118,13 @@ public class DiffController implements Initializable {
     targetOnly.getSelectionModel().selectedItemProperty()
       .addListener((observable, oldValue, newValue) -> showImageFromTargetPath(newValue));
 
-    sourceDeleteFileButton.disableProperty().bind(Bindings.isEmpty(sourceOnly.getSelectionModel().getSelectedItems()));
-    targetDeleteFileButton.disableProperty().bind(Bindings.isEmpty(targetOnly.getSelectionModel().getSelectedItems()));
+    BooleanBinding sourceOnlyBinding = Bindings.isEmpty(sourceOnly.getSelectionModel().getSelectedItems());
+    BooleanBinding targetOnlyBinding = Bindings.isEmpty(targetOnly.getSelectionModel().getSelectedItems());
+    sourceDeleteFileButton.disableProperty().bind(sourceOnlyBinding);
+    targetDeleteFileButton.disableProperty().bind(targetOnlyBinding);
 
-    copyToTargetButton.disableProperty().bind(Bindings.isEmpty(sourceOnly.getSelectionModel().getSelectedItems()));
-    copyToSourceButton.disableProperty().bind(Bindings.isEmpty(targetOnly.getSelectionModel().getSelectedItems()));
+    copyToTargetButton.disableProperty().bind(sourceOnlyBinding);
+    copyToSourceButton.disableProperty().bind(targetOnlyBinding);
 
     sourcePath.textProperty().bind(model.getSource().getPath());
     targetPath.textProperty().bind(model.getTarget().getPath());
@@ -199,23 +199,21 @@ public class DiffController implements Initializable {
     model.getContentDifferent().clear();
     model.getTargetOnly().clear();
 
-    CheckCommand rcloneCheckService = new CheckCommand(Runtime.getRuntime(), model);
+    CheckCommand checkCommand = new CheckCommand(Runtime.getRuntime(), model);
 
-    sourcePath.disableProperty().bind(rcloneCheckService.runningProperty());
-    targetPath.disableProperty().bind(rcloneCheckService.runningProperty());
-    sourceChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
-    targetChooseButton.disableProperty().bind(rcloneCheckService.runningProperty());
-    diffButton.disableProperty().bind(rcloneCheckService.runningProperty());
-    progressIndicator.visibleProperty().bind(rcloneCheckService.runningProperty());
-    sourceDeleteFileButton.disableProperty().bind(rcloneCheckService.runningProperty());
-    targetDeleteFileButton.disableProperty().bind(rcloneCheckService.runningProperty());
+    sourcePath.disableProperty().bind(checkCommand.runningProperty());
+    targetPath.disableProperty().bind(checkCommand.runningProperty());
+    sourceChooseButton.disableProperty().bind(checkCommand.runningProperty());
+    targetChooseButton.disableProperty().bind(checkCommand.runningProperty());
+    diffButton.disableProperty().bind(checkCommand.runningProperty());
+    progressIndicator.visibleProperty().bind(checkCommand.runningProperty());
 
-    rcloneCheckService.setOnSucceeded(event -> {
+    checkCommand.setOnSucceeded(new CommandSucceededEvent(checkCommand, () -> {
       sourceOnlyLabel.setText("Local only (" + sourceOnly.getItems().size() + ")");
       diffsLabel.setText("Different content (" + diffs.getItems().size() + ")");
       targetOnlyLabel.setText("Remote only (" + targetOnly.getItems().size() + ")");
-    });
-    rcloneCheckService.start();
+    }));
+    checkCommand.start();
   }
 
   private Path getTempDirectoryLazy() {
@@ -249,6 +247,11 @@ public class DiffController implements Initializable {
   public void deleteSourceFile() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), sourcePath.getText() + "/" + syncFile.getFile());
+    deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
+      model.getSourceOnly().remove(syncFile);
+      sourceOnly.getSelectionModel().clearSelection();
+    }));
+
     deleteCommand.start();
   }
 
@@ -259,6 +262,11 @@ public class DiffController implements Initializable {
   public void deleteTargetFile() {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), targetPath.getText() + "/" + syncFile.getFile());
+    deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
+      model.getTargetOnly().remove(syncFile);
+      targetOnly.getSelectionModel().clearSelection();
+    }));
+
     deleteCommand.start();
   }
 
@@ -266,20 +274,10 @@ public class DiffController implements Initializable {
   public void copyToTarget() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
     CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFile);
-    copyCommand.setOnSucceeded(event -> {
-      if (copyCommand.getReturnCode() == 0) {
-        model.getSourceOnly().remove(syncFile);
-        sourceOnly.getSelectionModel().clearSelection();
-      } else {
-        Alert alert = AlertDialogBuilder.buildLogDialog(copyCommand.getConsoleLog());
-        alert.setTitle("Error running rclone command");
-        alert.setHeaderText("Unexpected rclone return code: " + copyCommand.getReturnCode());
-        alert.setContentText("See details for rclone command and rclone console output");
-
-        Platform.runLater(() -> alert.showAndWait());
-      }
-      event.consume();
-    });
+    copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
+      model.getSourceOnly().remove(syncFile);
+      sourceOnly.getSelectionModel().clearSelection();
+    }));
     copyCommand.start();
   }
 
@@ -288,21 +286,10 @@ public class DiffController implements Initializable {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
     SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
     CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFileInverse);
-    copyCommand.setOnSucceeded(event -> {
-
-      if (copyCommand.getReturnCode() == 0) {
-        model.getTargetOnly().remove(syncFile);
-        targetOnly.getSelectionModel().clearSelection();
-      } else {
-        Alert alert = AlertDialogBuilder.buildLogDialog(copyCommand.getConsoleLog());
-        alert.setTitle("Error running rclone command");
-        alert.setHeaderText("Unexpected rclone return code: " + copyCommand.getReturnCode());
-        alert.setContentText("See details for rclone command and rclone console output");
-
-        Platform.runLater(() -> alert.showAndWait());
-      }
-      event.consume();
-    });
+    copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
+      model.getTargetOnly().remove(syncFile);
+      targetOnly.getSelectionModel().clearSelection();
+    }));
     copyCommand.start();
   }
 }

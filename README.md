@@ -13,6 +13,5 @@ More to come.
   - show preview for different file types than jpg
 
 - TECHNICAL
-  - refresh after delete (list and counter)
   - use lsjon instead of check (re-implement matching)?
   - Tree instead of ListView

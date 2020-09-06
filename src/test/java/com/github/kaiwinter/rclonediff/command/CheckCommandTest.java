@@ -1,7 +1,6 @@
 package com.github.kaiwinter.rclonediff.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,8 +12,6 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -151,45 +148,4 @@ class CheckCommandTest {
     assertEquals("c:/temp/", syncFile.getSourcePath());
     assertEquals("Dropbox:/backup", syncFile.getTargetPath());
   }
-
-  /**
-   * Tests if an Exception is thrown if the rclone summary tells a different number of differences
-   * than the number which were parsed.
-   */
-  @Test
-  void parsed_too_less() throws IOException, InterruptedException, ExecutionException {
-    String rcloneOutput =
-      "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: Sizes differ\r\n2020/05/26 15:17:07 NOTICE: Encrypted drive 'Dropbox:/backup': 2 differences found";
-
-    Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(rcloneOutput.getBytes())).getMock();
-    Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
-
-    DiffModel model = new DiffModel();
-    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
-
-    CheckCommand checkCommand = new CheckCommand(runtime, model);
-    Task<Void> task = checkCommand.createTask();
-    task.run();
-
-    FutureTask<Throwable> futureTask = new FutureTask<>(() -> {
-      return task.getException();
-    });
-
-    Platform.runLater(futureTask);
-    Throwable data = futureTask.get();
-    assertNotNull(data);
-
-    assertTrue(model.getTargetOnly().isEmpty());
-    assertTrue(model.getSourceOnly().isEmpty());
-
-    List<SyncFile> sizeDiffer = model.getContentDifferent();
-    assertEquals(1, sizeDiffer.size());
-
-    SyncFile syncFile = sizeDiffer.get(0);
-    assertEquals("20200108_184311.jpg", syncFile.getFile());
-    assertEquals("c:/temp/", syncFile.getSourcePath());
-    assertEquals("Dropbox:/backup", syncFile.getTargetPath());
-  }
-
 }
