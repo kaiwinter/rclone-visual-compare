@@ -31,29 +31,23 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DiffController implements Initializable {
 
-  @Getter
   @FXML
   private TextField sourcePath;
 
-  @Getter
   @FXML
   private TextField targetPath;
 
-  @Getter
   @FXML
   private ListView<SyncFile> sourceOnly;
 
-  @Getter
   @FXML
   private ListView<SyncFile> diffs;
 
-  @Getter
   @FXML
   private ListView<SyncFile> targetOnly;
 
@@ -72,15 +66,12 @@ public class DiffController implements Initializable {
   @FXML
   private Label targetOnlyLabel;
 
-  @Getter
   @FXML
   private Button sourceChooseButton;
 
-  @Getter
   @FXML
   private Button targetChooseButton;
 
-  @Getter
   @FXML
   private Button diffButton;
 
