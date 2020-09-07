@@ -6,7 +6,6 @@ More to come.
 
 ## TODO
 - FEATURES
-  - Cancel for diff
   - Export of the result
   - Sorter/formatter for lists (SyncFile-Object)
   - click preview image for large view

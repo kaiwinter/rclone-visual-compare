@@ -28,6 +28,7 @@ public class CheckCommand extends AbstractCommand {
 
   private final Runtime runtime;
   private final DiffModel model;
+  private boolean isCancelled = false;
 
   @Override
   protected void execute() throws IOException {
@@ -62,6 +63,9 @@ public class CheckCommand extends AbstractCommand {
 
     String line;
     while ((line = reader.readLine()) != null) {
+      if (isCancelled) {
+        break;
+      }
       Matcher matcher;
 
       if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
@@ -94,6 +98,11 @@ public class CheckCommand extends AbstractCommand {
     returnCode = process.exitValue();
     log.info("rclone return code: {}", returnCode);
   }
+
+  @Override
+	protected void cancelled() {
+		this.isCancelled = true;
+	}
 
   @Override
   public int[] getExpectedReturnCodes() {

@@ -204,17 +204,24 @@ public class DiffController implements Initializable {
 
   @FXML
   public void diff() {
+    // re-use diff button as cancel button
+    if ("Cancel".equals(diffButton.getText())) {
+    	model.getRunningCheckCommand().cancel();
+    	diffButton.setText("Diff");
+    	return;
+    }
+    diffButton.setText("Cancel");
     model.getSourceOnly().clear();
     model.getContentDifferent().clear();
     model.getTargetOnly().clear();
 
     CheckCommand checkCommand = new CheckCommand(Runtime.getRuntime(), model);
+    model.setRunningCheckCommand(checkCommand);
 
     sourcePath.disableProperty().bind(checkCommand.runningProperty());
     targetPath.disableProperty().bind(checkCommand.runningProperty());
     sourceChooseButton.disableProperty().bind(checkCommand.runningProperty());
     targetChooseButton.disableProperty().bind(checkCommand.runningProperty());
-    diffButton.disableProperty().bind(checkCommand.runningProperty());
     progressIndicator.visibleProperty().bind(checkCommand.runningProperty());
 
     checkCommand.setOnSucceeded(new CommandSucceededEvent(checkCommand, () -> {

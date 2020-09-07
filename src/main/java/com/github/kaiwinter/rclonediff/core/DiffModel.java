@@ -23,4 +23,6 @@ public class DiffModel {
 
   /** Files which are on the target side only. */
   private ObservableList<SyncFile> targetOnly = FXCollections.observableArrayList();
+  
+  private CheckCommand runningCheckCommand;
 }
