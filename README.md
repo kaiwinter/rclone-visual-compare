@@ -8,7 +8,6 @@ More to come.
 - FEATURES
   - Export of the result
   - Sorter/formatter for lists (SyncFile-Object)
-  - click preview image for large view
   - show preview for different file types than jpg
 
 - TECHNICAL
