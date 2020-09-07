@@ -25,4 +25,6 @@ public class DiffModel {
   private ObservableList<SyncFile> targetOnly = FXCollections.observableArrayList();
   
   private CheckCommand runningCheckCommand;
+
+  private CopyCommand latestCopyCommand;
 }

@@ -103,9 +103,6 @@ public class DiffController implements Initializable {
 
   private DiffModel model = new DiffModel();
 
-  private CopyCommand latestCopyCommand;
-
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     sourceOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
@@ -193,13 +190,13 @@ public class DiffController implements Initializable {
     CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), syncFile);
     rcloneCopyService.setOnSucceeded(event -> {
 
-      if (rcloneCopyService == latestCopyCommand) {
+      if (rcloneCopyService == model.getLatestCopyCommand()) {
         targetImageView.setImage(rcloneCopyService.getLoadedImage());
         event.consume();
       }
     });
     rcloneCopyService.start();
-    latestCopyCommand = rcloneCopyService;
+    model.setLatestCopyCommand(rcloneCopyService);
   }
 
   @FXML
