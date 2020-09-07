@@ -1,6 +1,7 @@
 package com.github.kaiwinter.rclonediff.core;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -131,6 +132,9 @@ public class DiffController implements Initializable {
     if (syncFile == null) {
       return;
     }
+    if (!isImage(syncFile)) {
+      return;
+    }
 
     String path = sourcePath.getText();
 
@@ -146,6 +150,9 @@ public class DiffController implements Initializable {
     if (syncFile == null) {
       return;
     }
+    if (!isImage(syncFile)) {
+      return;
+    }
 
     String path = targetPath.getText();
 
@@ -154,6 +161,10 @@ public class DiffController implements Initializable {
     } else {
       showRemoteFile(new SyncFile(syncFile.getTargetPath(), getTempDirectoryLazy().toString(), syncFile.getFile()), targetOnlyImage);
     }
+  }
+
+  private boolean isImage(SyncFile syncFile) {
+    return syncFile.getFile().toLowerCase().endsWith(".jpg");
   }
 
   private boolean isLocalPath(String path) {
@@ -182,7 +193,17 @@ public class DiffController implements Initializable {
     rcloneCopyService.setOnSucceeded(event -> {
 
       if (rcloneCopyService == model.getLatestCopyCommand()) {
-        targetImageView.setImage(rcloneCopyService.getLoadedImage());
+        Image currentImage = targetImageView.getImage();
+        if (currentImage != null) {
+          currentImage.cancel();
+        }
+        Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
+        URI filename = completeFilePath.toUri();
+
+        Image image = new Image(filename.toString(), true);
+        image.exceptionProperty().addListener((observable, oldValue, newValue) -> log.error(newValue.getMessage(), newValue));
+
+        targetImageView.setImage(image);
         event.consume();
       }
     });
@@ -194,9 +215,9 @@ public class DiffController implements Initializable {
   public void diff() {
     // re-use diff button as cancel button
     if ("Cancel".equals(diffButton.getText())) {
-    	model.getRunningCheckCommand().cancel();
-    	diffButton.setText("Diff");
-    	return;
+      model.getRunningCheckCommand().cancel();
+      diffButton.setText("Diff");
+      return;
     }
     diffButton.setText("Cancel");
     model.getSourceOnly().clear();

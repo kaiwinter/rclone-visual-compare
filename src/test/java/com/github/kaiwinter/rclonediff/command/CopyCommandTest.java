@@ -1,6 +1,6 @@
 package com.github.kaiwinter.rclonediff.command;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -51,10 +51,10 @@ class CopyCommandTest {
   }
 
   /**
-   * Tests if the image gets initialized (with an invalid file).
+   * Tests if the return code was set.
    */
   @Test
-  void load_image() throws IOException {
+  void return_code() throws IOException {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(new byte[] {})).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
@@ -63,7 +63,6 @@ class CopyCommandTest {
     CopyCommand copyCommand = new CopyCommand(runtime, syncFile);
     copyCommand.createTask().run();
 
-    assertNotNull(copyCommand.getLoadedImage());
+    assertEquals(0, copyCommand.getReturnCode());
   }
-
 }

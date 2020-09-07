@@ -148,4 +148,22 @@ class CheckCommandTest {
     assertEquals("c:/temp/", syncFile.getSourcePath());
     assertEquals("Dropbox:/backup", syncFile.getTargetPath());
   }
+
+  /**
+   * Tests if the return code was set.
+   */
+  @Test
+  void return_code() throws IOException {
+    Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(new byte[] {})).getMock();
+    Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
+
+    DiffModel model = new DiffModel();
+    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+
+    CheckCommand checkCommand = new CheckCommand(runtime, model);
+    checkCommand.createTask().run();
+
+    assertEquals(0, checkCommand.getReturnCode());
+  }
 }
