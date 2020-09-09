@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -47,7 +46,7 @@ class CopyCommandTest {
     CopyCommand copyCommand = new CopyCommand(runtime, syncFile);
     copyCommand.createTask().run();
 
-    verify(runtime).exec(eq("rclone copy \"Dropbox:/backup/file.jpg\" \"c:" + File.separator + "systemp\""));
+    verify(runtime).exec(eq("rclone copy \"Dropbox:/backup/file.jpg\" \"c:/systemp/\""));
   }
 
   /**

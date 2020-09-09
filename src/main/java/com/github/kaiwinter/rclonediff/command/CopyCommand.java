@@ -3,7 +3,6 @@ package com.github.kaiwinter.rclonediff.command;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
@@ -22,14 +21,20 @@ public class CopyCommand extends AbstractCommand {
 
   @Override
   protected void execute() throws IOException {
-    Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
-    if (!completeFilePath.toFile().exists()) {
-      copyFileFromTo(syncFile.getFile(), syncFile.getSourcePath(), completeFilePath.getParent());
-    }
+    copyFileFromTo(syncFile.getFile(), syncFile.getSourcePath(), syncFile.getTargetPath());
   }
 
-  private void copyFileFromTo(String file, String fromPath, Path toPath) throws IOException {
-    String command = "rclone copy \"" + fromPath + "/" + file + "\" \"" + toPath + "\"";
+  private void copyFileFromTo(String file, String fromPath, String toPath) throws IOException {
+    if (!fromPath.endsWith("/")) {
+    	fromPath = fromPath + "/";
+    }
+    if (!toPath.endsWith("/")) {
+    	toPath = toPath + "/";
+    }
+    
+    String targetDirectory = toPath + file;
+    targetDirectory = targetDirectory.substring(0, targetDirectory.lastIndexOf("/") + 1);
+    String command = "rclone copy \"" + fromPath + file + "\" \"" + targetDirectory + "\"";
     log.info("Copy command: {}", command);
     consoleLog.add(command);
 
