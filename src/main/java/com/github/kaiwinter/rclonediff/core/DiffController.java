@@ -274,8 +274,8 @@ public class DiffController implements Initializable {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), sourcePath.getText() + "/" + syncFile.getFile());
     deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
-      model.getSourceOnly().remove(syncFile);
       sourceOnly.getSelectionModel().clearSelection();
+      model.getSourceOnly().remove(syncFile);
     }));
 
     deleteCommand.start();
@@ -289,8 +289,8 @@ public class DiffController implements Initializable {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), targetPath.getText() + "/" + syncFile.getFile());
     deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
-      model.getTargetOnly().remove(syncFile);
       targetOnly.getSelectionModel().clearSelection();
+      model.getTargetOnly().remove(syncFile);
     }));
 
     deleteCommand.start();
@@ -301,8 +301,8 @@ public class DiffController implements Initializable {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
     CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFile);
     copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
-      model.getSourceOnly().remove(syncFile);
       sourceOnly.getSelectionModel().clearSelection();
+      model.getSourceOnly().remove(syncFile);
     }));
     copyCommand.start();
   }
@@ -313,8 +313,8 @@ public class DiffController implements Initializable {
     SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
     CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFileInverse);
     copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
-      model.getTargetOnly().remove(syncFile);
       targetOnly.getSelectionModel().clearSelection();
+      model.getTargetOnly().remove(syncFile);
     }));
     copyCommand.start();
   }
