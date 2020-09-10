@@ -1,7 +1,6 @@
 package com.github.kaiwinter.rclonediff.core;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -139,7 +138,8 @@ public class DiffController implements Initializable {
     String path = sourcePath.getText();
 
     if (isLocalPath(path)) {
-      showLocalFile(syncFile.getSourcePath() + "/" + syncFile.getFile(), sourceOnlyImage);
+      Path completeFilePath = Path.of(syncFile.getSourcePath()).resolve(syncFile.getFile());
+      showLocalFile(completeFilePath, sourceOnlyImage);
     } else {
       showRemoteFile(new SyncFile(syncFile.getSourcePath(), getTempDirectoryLazy().toString(), syncFile.getFile()), sourceOnlyImage);
     }
@@ -157,7 +157,8 @@ public class DiffController implements Initializable {
     String path = targetPath.getText();
 
     if (isLocalPath(path)) {
-      showLocalFile(syncFile.getTargetPath() + "/" + syncFile.getFile(), targetOnlyImage);
+      Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
+      showLocalFile(completeFilePath, targetOnlyImage);
     } else {
       showRemoteFile(new SyncFile(syncFile.getTargetPath(), getTempDirectoryLazy().toString(), syncFile.getFile()), targetOnlyImage);
     }
@@ -176,7 +177,7 @@ public class DiffController implements Initializable {
     return true;
   }
 
-  private void showLocalFile(String absoluteFilename, ImageView targetImageView) {
+  private void showLocalFile(Path absoluteFilename, ImageView targetImageView) {
     Image currentImage = targetImageView.getImage();
     if (currentImage != null) {
       currentImage.cancel();
@@ -189,21 +190,16 @@ public class DiffController implements Initializable {
   }
 
   private void showRemoteFile(SyncFile syncFile, ImageView targetImageView) {
+    Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
+    if (completeFilePath.toFile().exists()) {
+      showLocalFile(completeFilePath, targetImageView);
+      return;
+    }
     CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), syncFile);
     rcloneCopyService.setOnSucceeded(event -> {
 
       if (rcloneCopyService == model.getLatestCopyCommand()) {
-        Image currentImage = targetImageView.getImage();
-        if (currentImage != null) {
-          currentImage.cancel();
-        }
-        Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
-        URI filename = completeFilePath.toUri();
-
-        Image image = new Image(filename.toString(), true);
-        image.exceptionProperty().addListener((observable, oldValue, newValue) -> log.error(newValue.getMessage(), newValue));
-
-        targetImageView.setImage(image);
+        showLocalFile(completeFilePath, targetImageView);
         event.consume();
       }
     });
@@ -274,7 +270,6 @@ public class DiffController implements Initializable {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), sourcePath.getText() + "/" + syncFile.getFile());
     deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
-      sourceOnly.getSelectionModel().clearSelection();
       model.getSourceOnly().remove(syncFile);
     }));
 
@@ -289,7 +284,6 @@ public class DiffController implements Initializable {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), targetPath.getText() + "/" + syncFile.getFile());
     deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
-      targetOnly.getSelectionModel().clearSelection();
       model.getTargetOnly().remove(syncFile);
     }));
 
@@ -301,7 +295,6 @@ public class DiffController implements Initializable {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
     CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFile);
     copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
-      sourceOnly.getSelectionModel().clearSelection();
       model.getSourceOnly().remove(syncFile);
     }));
     copyCommand.start();
@@ -313,7 +306,6 @@ public class DiffController implements Initializable {
     SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
     CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFileInverse);
     copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
-      targetOnly.getSelectionModel().clearSelection();
       model.getTargetOnly().remove(syncFile);
     }));
     copyCommand.start();

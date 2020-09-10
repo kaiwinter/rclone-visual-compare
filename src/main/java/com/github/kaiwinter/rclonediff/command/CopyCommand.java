@@ -25,13 +25,6 @@ public class CopyCommand extends AbstractCommand {
   }
 
   private void copyFileFromTo(String file, String fromPath, String toPath) throws IOException {
-    if (!fromPath.endsWith("/")) {
-    	fromPath = fromPath + "/";
-    }
-    if (!toPath.endsWith("/")) {
-    	toPath = toPath + "/";
-    }
-    
     String targetDirectory = toPath + file;
     targetDirectory = targetDirectory.substring(0, targetDirectory.lastIndexOf("/") + 1);
     String command = "rclone copy \"" + fromPath + file + "\" \"" + targetDirectory + "\"";
