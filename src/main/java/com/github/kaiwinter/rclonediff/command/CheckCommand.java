@@ -28,7 +28,9 @@ public class CheckCommand extends AbstractCommand {
 
   private final Runtime runtime;
   private final DiffModel model;
+
   private boolean isCancelled = false;
+  private Process process;
 
   @Override
   protected void execute() throws IOException {
@@ -39,7 +41,7 @@ public class CheckCommand extends AbstractCommand {
     log.info("Check command: {}", command);
     consoleLog.add(command);
 
-    Process process = runtime.exec(command);
+    process = runtime.exec(command);
     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
     Pattern sourcePattern;
@@ -102,6 +104,7 @@ public class CheckCommand extends AbstractCommand {
   @Override
 	protected void cancelled() {
 		this.isCancelled = true;
+		this.process.destroy();
 	}
 
   @Override
