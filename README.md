@@ -4,11 +4,17 @@ This is done by using the `clone check` command with afterwards parsing of its o
 The UI provides simple functions like deleting one file on one of both sides or showing a preview of images.
 More to come.
 
+## Prerequisites
+- rclone binary on PATH
+- Java/JavaFX 11
+
 ## TODO
 - FEATURES
   - Export of the result
   - Sorter/formatter for lists (SyncFile-Object)
   - show preview for different file types than jpg
+  - Set path to rclone binary
+  - Copy/delete operations for "different content"
 
 - TECHNICAL
   - use lsjon instead of check (re-implement matching)?
