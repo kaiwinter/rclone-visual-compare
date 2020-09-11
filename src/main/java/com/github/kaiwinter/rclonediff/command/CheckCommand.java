@@ -102,10 +102,10 @@ public class CheckCommand extends AbstractCommand {
   }
 
   @Override
-	protected void cancelled() {
-		this.isCancelled = true;
-		this.process.destroy();
-	}
+  protected void cancelled() {
+    this.isCancelled = true;
+    this.process.destroy();
+  }
 
   @Override
   public int[] getExpectedReturnCodes() {

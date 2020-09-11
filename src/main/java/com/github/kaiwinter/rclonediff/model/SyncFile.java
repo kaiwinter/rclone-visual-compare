@@ -25,10 +25,10 @@ public class SyncFile {
 
   public SyncFile(String sourcePath, String targetPath, String file) {
     if (!sourcePath.endsWith("/")) {
-    	sourcePath = sourcePath + "/";
+      sourcePath = sourcePath + "/";
     }
     if (!targetPath.endsWith("/")) {
-    	targetPath = targetPath + "/";
+      targetPath = targetPath + "/";
     }
     this.sourcePath = sourcePath;
     this.targetPath = targetPath;
