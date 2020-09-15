@@ -14,8 +14,8 @@ import lombok.Data;
  */
 @Data
 public class DiffModel {
-  private SyncEndpoint source = new SyncEndpoint(SyncEndpoint.Type.LOCAL, "z:/2017/");
-  private SyncEndpoint target = new SyncEndpoint(SyncEndpoint.Type.REMOTE, "DropboxTineCrypt:/2017/");
+  private SyncEndpoint source;
+  private SyncEndpoint target;
 
   /** Files which are only on the source side only. */
   private ObservableList<SyncFile> sourceOnly = FXCollections.observableArrayList();

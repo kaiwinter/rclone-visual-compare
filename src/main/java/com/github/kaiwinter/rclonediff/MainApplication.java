@@ -25,16 +25,6 @@ public class MainApplication extends Application {
     Scene scene = new Scene(page);
     controller = loader.getController();
 
-    // scene.getRoot().cursorProperty().bind(Bindings.when(service.runningProperty()).then(Cursor.WAIT).otherwise(Cursor.DEFAULT));
-    // controller.getLocalPath().disableProperty().bind(service.runningProperty());
-    // controller.getRemotePath().disableProperty().bind(service.runningProperty());
-    // controller.getLocalChooseButton().disableProperty().bind(service.runningProperty());
-    // controller.getRemoteChooseButton().disableProperty().bind(service.runningProperty());
-    // controller.getDiffButton().disableProperty().bind(service.runningProperty());
-    // controller.getLocalOnly().disableProperty().bind(service.runningProperty());
-    // controller.getRemoteOnly().disableProperty().bind(service.runningProperty());
-    // controller.getDiffs().disableProperty().bind(service.runningProperty());
-
     primaryStage.setScene(scene);
     primaryStage.show();
     primaryStage.setTitle("rclone visual diff");

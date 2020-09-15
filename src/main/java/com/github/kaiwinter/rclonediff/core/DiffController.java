@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
@@ -13,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
+import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
 
@@ -118,8 +120,9 @@ public class DiffController implements Initializable {
     copyToTargetButton.disableProperty().bind(sourceOnlyBinding);
     copyToSourceButton.disableProperty().bind(targetOnlyBinding);
 
-    sourcePath.textProperty().bind(model.getSource().getPath());
-    targetPath.textProperty().bind(model.getTarget().getPath());
+    // TODO KW: Binding?
+    // sourcePath.textProperty().bind(model.getSource().getPath());
+    // targetPath.textProperty().bind(model.getTarget().getPath());
 
     sourceOnly.setItems(model.getSourceOnly());
     diffs.setItems(model.getContentDifferent());
@@ -335,5 +338,27 @@ public class DiffController implements Initializable {
     root.getChildren().add(imageView);
 
     stage.show();
+  }
+
+  @FXML
+  public void chooseSourcePath() throws IOException {
+    PathDialogController pathDialogController = new PathDialogController(model.getSource());
+    Optional<SyncEndpoint> result = pathDialogController.getResult();
+    if (result.isPresent()) {
+      // TODO KW: Binding?
+      model.setSource(result.get());
+      sourcePath.setText(result.get().toUiString());
+    }
+  }
+
+  @FXML
+  public void chooseTargetPath() {
+    PathDialogController pathDialogController = new PathDialogController(model.getTarget());
+    Optional<SyncEndpoint> result = pathDialogController.getResult();
+    if (result.isPresent()) {
+      // TODO KW: Binding?
+      model.setTarget(result.get());
+      targetPath.setText(result.get().toUiString());
+    }
   }
 }

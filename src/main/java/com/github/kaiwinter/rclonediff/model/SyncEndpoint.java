@@ -1,6 +1,5 @@
 package com.github.kaiwinter.rclonediff.model;
 
-import javafx.beans.property.SimpleStringProperty;
 import lombok.Data;
 
 /**
@@ -17,10 +16,9 @@ public class SyncEndpoint {
   }
 
   private final Type type;
-  private final SimpleStringProperty path;
+  private final String path;
 
-  public SyncEndpoint(Type type, String string) {
-    this.type = type;
-    this.path = new SimpleStringProperty(string);
+  public String toUiString() {
+    return path + " (" + type + ")";
   }
 }
