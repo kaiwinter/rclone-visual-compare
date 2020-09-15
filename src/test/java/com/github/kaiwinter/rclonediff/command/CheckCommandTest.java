@@ -85,7 +85,7 @@ class CheckCommandTest {
     SyncFile syncFile = notInLocal.get(0);
     assertEquals("20200501_081347.mp4", syncFile.getFile());
     assertEquals("c:/temp/", syncFile.getSourcePath());
-    assertEquals("Dropbox:/backup", syncFile.getTargetPath());
+    assertEquals("Dropbox:/backup/", syncFile.getTargetPath());
   }
 
   /**
@@ -115,7 +115,7 @@ class CheckCommandTest {
     SyncFile syncFile = notInRemote.get(0);
     assertEquals("20200201_090433.jpg", syncFile.getFile());
     assertEquals("c:/temp/", syncFile.getSourcePath());
-    assertEquals("Dropbox:/backup", syncFile.getTargetPath());
+    assertEquals("Dropbox:/backup/", syncFile.getTargetPath());
   }
 
   /**
@@ -146,7 +146,7 @@ class CheckCommandTest {
     SyncFile syncFile = sizeDiffer.get(0);
     assertEquals("20200108_184311.jpg", syncFile.getFile());
     assertEquals("c:/temp/", syncFile.getSourcePath());
-    assertEquals("Dropbox:/backup", syncFile.getTargetPath());
+    assertEquals("Dropbox:/backup/", syncFile.getTargetPath());
   }
 
   /**
