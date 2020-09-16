@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
+import com.github.kaiwinter.rclonediff.model.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import com.github.kaiwinter.rclonediff.core.DiffModel;
+import com.github.kaiwinter.rclonediff.model.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 

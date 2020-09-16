@@ -1,9 +1,8 @@
-package com.github.kaiwinter.rclonediff.core;
+package com.github.kaiwinter.rclonediff.model;
 
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
-import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
-import com.github.kaiwinter.rclonediff.model.SyncFile;
+import com.github.kaiwinter.rclonediff.core.DiffController;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

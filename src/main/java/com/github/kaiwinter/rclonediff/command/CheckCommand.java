@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.kaiwinter.rclonediff.core.DiffModel;
+import com.github.kaiwinter.rclonediff.model.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
