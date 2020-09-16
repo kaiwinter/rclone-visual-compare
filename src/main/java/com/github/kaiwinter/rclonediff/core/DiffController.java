@@ -33,6 +33,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -120,9 +121,24 @@ public class DiffController implements Initializable {
     copyToTargetButton.disableProperty().bind(sourceOnlyBinding);
     copyToSourceButton.disableProperty().bind(targetOnlyBinding);
 
-    // TODO KW: Binding?
-    // sourcePath.textProperty().bind(model.getSource().getPath());
-    // targetPath.textProperty().bind(model.getTarget().getPath());
+    StringConverter<SyncEndpoint> converter = new StringConverter<>() {
+
+      @Override
+      public String toString(SyncEndpoint object) {
+        if (object == null) {
+          return null;
+        }
+        return object.toUiString();
+      }
+
+      @Override
+      public SyncEndpoint fromString(String string) {
+        throw new UnsupportedOperationException("Converting from String to SyncEndpoint not implemented");
+      }
+
+    };
+    Bindings.bindBidirectional(sourcePath.textProperty(), model.getSource(), converter);
+    Bindings.bindBidirectional(targetPath.textProperty(), model.getTarget(), converter);
 
     sourceOnly.setItems(model.getSourceOnly());
     diffs.setItems(model.getContentDifferent());
@@ -342,23 +358,15 @@ public class DiffController implements Initializable {
 
   @FXML
   public void chooseSourcePath() throws IOException {
-    PathDialogController pathDialogController = new PathDialogController(model.getSource());
+    PathDialogController pathDialogController = new PathDialogController(model.getSource().getValue());
     Optional<SyncEndpoint> result = pathDialogController.getResult();
-    if (result.isPresent()) {
-      // TODO KW: Binding?
-      model.setSource(result.get());
-      sourcePath.setText(result.get().toUiString());
-    }
+    result.ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
   }
 
   @FXML
   public void chooseTargetPath() {
-    PathDialogController pathDialogController = new PathDialogController(model.getTarget());
+    PathDialogController pathDialogController = new PathDialogController(model.getTarget().getValue());
     Optional<SyncEndpoint> result = pathDialogController.getResult();
-    if (result.isPresent()) {
-      // TODO KW: Binding?
-      model.setTarget(result.get());
-      targetPath.setText(result.get().toUiString());
-    }
+    result.ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
   }
 }

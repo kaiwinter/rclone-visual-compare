@@ -5,6 +5,8 @@ import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Data;
@@ -14,8 +16,8 @@ import lombok.Data;
  */
 @Data
 public class DiffModel {
-  private SyncEndpoint source;
-  private SyncEndpoint target;
+  private ObjectProperty<SyncEndpoint> source = new SimpleObjectProperty<>();
+  private ObjectProperty<SyncEndpoint> target = new SimpleObjectProperty<>();
 
   /** Files which are only on the source side only. */
   private ObservableList<SyncFile> sourceOnly = FXCollections.observableArrayList();

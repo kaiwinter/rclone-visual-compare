@@ -49,8 +49,8 @@ class CheckCommandTest {
     Runtime runtime = mock(Runtime.class, Answers.RETURNS_MOCKS);
 
     DiffModel model = new DiffModel();
-    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
 
     CheckCommand checkCommand = new CheckCommand(runtime, model);
     checkCommand.createTask().run();
@@ -69,8 +69,8 @@ class CheckCommandTest {
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
     DiffModel model = new DiffModel();
-    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
 
     CheckCommand checkCommand = new CheckCommand(runtime, model);
     Task<Void> task = checkCommand.createTask();
@@ -99,8 +99,8 @@ class CheckCommandTest {
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
     DiffModel model = new DiffModel();
-    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
 
     CheckCommand checkCommand = new CheckCommand(runtime, model);
     Task<Void> task = checkCommand.createTask();
@@ -129,8 +129,8 @@ class CheckCommandTest {
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
     DiffModel model = new DiffModel();
-    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
 
     CheckCommand checkCommand = new CheckCommand(runtime, model);
     Task<Void> task = checkCommand.createTask();
@@ -158,8 +158,8 @@ class CheckCommandTest {
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
     DiffModel model = new DiffModel();
-    model.setSource(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.setTarget(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
 
     CheckCommand checkCommand = new CheckCommand(runtime, model);
     checkCommand.createTask().run();

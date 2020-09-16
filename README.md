@@ -20,7 +20,6 @@ The current focus of this project is to compare directories which contain images
   - show preview for different file types than jpg
   - Set path to rclone binary
   - Copy/delete operations for "different content" section
-  - Improve local/remote directory chooser
   - Show metadata for files (size etc.)
   - store last paths
 

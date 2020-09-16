@@ -34,8 +34,8 @@ public class CheckCommand extends AbstractCommand {
 
   @Override
   protected void execute() throws IOException {
-    SyncEndpoint source = model.getSource();
-    SyncEndpoint target = model.getTarget();
+    SyncEndpoint source = model.getSource().getValue();
+    SyncEndpoint target = model.getTarget().getValue();
 
     String command = "rclone check " + source.getPath() + " " + target.getPath();
     log.info("Check command: {}", command);
