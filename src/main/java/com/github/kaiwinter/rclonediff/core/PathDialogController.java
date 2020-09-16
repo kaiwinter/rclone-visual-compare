@@ -7,8 +7,11 @@ import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
@@ -57,20 +60,26 @@ public class PathDialogController {
 
       Dialog<SyncEndpoint> dialog = new Dialog<>();
       dialog.setTitle("Configure path");
+
+      BooleanBinding isPathValid = Bindings.createBooleanBinding(() -> path.getText().isEmpty(), path.textProperty());
+      BooleanBinding isTypeValid = Bindings.createBooleanBinding(() -> type.getSelectedToggle() == null, type.selectedToggleProperty());
+
+      Node okButton = dialogPane.lookupButton(ButtonType.OK);
+      okButton.disableProperty().bind(isPathValid.or(isTypeValid));
+
       dialog.setResultConverter(buttonType -> {
 
         if (buttonType == ButtonType.CANCEL) {
           return null;
         }
-        // TODO KW: Validate valid input. Is there a way to allow OK only if path is set and type is
-        // selected?
+
         Type syncEndpointType;
         if (type.getSelectedToggle() == localToggle) {
           syncEndpointType = Type.LOCAL;
         } else if (type.getSelectedToggle() == remoteToggle) {
           syncEndpointType = Type.REMOTE;
         } else {
-          throw new IllegalArgumentException("No Type selected");
+          throw new IllegalArgumentException("Unknown type");
         }
         return new SyncEndpoint(syncEndpointType, path.getText().trim());
       });
