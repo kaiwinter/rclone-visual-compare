@@ -21,7 +21,6 @@ The current focus of this project is to compare directories which contain images
   - Set path to rclone binary
   - Copy/delete operations for "different content" section
   - Show metadata for files (size etc.)
-  - store last paths
 
 - TECHNICAL
   - Sorter/formatter for lists (SyncFile-Object)

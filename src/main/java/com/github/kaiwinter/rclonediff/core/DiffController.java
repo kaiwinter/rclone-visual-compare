@@ -144,6 +144,9 @@ public class DiffController implements Initializable {
     sourceOnly.setItems(model.getSourceOnly());
     diffs.setItems(model.getContentDifferent());
     targetOnly.setItems(model.getTargetOnly());
+
+    PreferencesStore.loadSourceEndpoint().ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
+    PreferencesStore.loadTargetEndpoint().ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
   }
 
   private void showImageFromSourcePath(SyncFile syncFile) {
@@ -361,13 +364,19 @@ public class DiffController implements Initializable {
   public void chooseSourcePath() throws IOException {
     PathDialogController pathDialogController = new PathDialogController(model.getSource().getValue());
     Optional<SyncEndpoint> result = pathDialogController.getResult();
-    result.ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
+    result.ifPresent(syncEndpoint -> {
+      model.getSource().setValue(syncEndpoint);
+      PreferencesStore.saveSourceEndpoint(syncEndpoint);
+    });
   }
 
   @FXML
   public void chooseTargetPath() {
     PathDialogController pathDialogController = new PathDialogController(model.getTarget().getValue());
     Optional<SyncEndpoint> result = pathDialogController.getResult();
-    result.ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
+    result.ifPresent(syncEndpoint -> {
+      model.getTarget().setValue(syncEndpoint);
+      PreferencesStore.saveTargetEndpoint(syncEndpoint);
+    });
   }
 }
