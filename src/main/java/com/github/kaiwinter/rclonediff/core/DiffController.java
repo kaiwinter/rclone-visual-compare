@@ -11,6 +11,10 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
 
+import com.dlsc.preferencesfx.PreferencesFx;
+import com.dlsc.preferencesfx.model.Category;
+import com.dlsc.preferencesfx.model.Setting;
+import com.github.kaiwinter.rclonediff.MainApplication;
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
@@ -98,6 +102,8 @@ public class DiffController implements Initializable {
 
   private DiffModel model = new DiffModel();
 
+  private PreferencesFx preferencesFx;
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     sourceOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
@@ -147,6 +153,9 @@ public class DiffController implements Initializable {
 
     PreferencesStore.loadSourceEndpoint().ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
     PreferencesStore.loadTargetEndpoint().ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
+
+    preferencesFx =
+      PreferencesFx.of(MainApplication.class, Category.of("General", Setting.of("Path to rclone", model.getRcloneBinaryPath())));
   }
 
   private void showImageFromSourcePath(SyncFile syncFile) {
@@ -378,5 +387,11 @@ public class DiffController implements Initializable {
       model.getTarget().setValue(syncEndpoint);
       PreferencesStore.saveTargetEndpoint(syncEndpoint);
     });
+  }
+
+  @FXML
+  public void openPreferences() {
+    preferencesFx.show(true);
+
   }
 }

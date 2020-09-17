@@ -11,14 +11,12 @@ The current focus of this project is to compare directories which contain images
 - Delete/copy file to synchronize directories
 
 ## Prerequisites
-- rclone binary on PATH
 - Java/JavaFX 11
 
 ## TODO
 - FEATURES
   - Export of the result
   - show preview for different file types than jpg
-  - Set path to rclone binary
   - Copy/delete operations for "different content" section
   - Show metadata for files (size etc.)
 

@@ -37,7 +37,7 @@ public class CheckCommand extends AbstractCommand {
     SyncEndpoint source = model.getSource().getValue();
     SyncEndpoint target = model.getTarget().getValue();
 
-    String command = "rclone check " + source.getPath() + " " + target.getPath();
+    String command = model.getRcloneBinaryPath().getValue() + " check " + source.getPath() + " " + target.getPath();
     log.info("Check command: {}", command);
     consoleLog.add(command);
 
