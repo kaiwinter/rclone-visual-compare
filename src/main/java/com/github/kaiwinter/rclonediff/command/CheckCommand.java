@@ -48,17 +48,17 @@ public class CheckCommand extends AbstractCommand {
     Pattern targetPattern;
 
     if (source.getType() == Type.LOCAL) {
-      sourcePattern = Pattern.compile(NOT_IN_LOCAL.replace("{0}", source.getPath()));
+      sourcePattern = Pattern.compile(NOT_IN_LOCAL.replace("{0}", Pattern.quote(source.getPath())));
     } else if (source.getType() == Type.REMOTE) {
-      sourcePattern = Pattern.compile(NOT_IN_REMOTE.replace("{0}", source.getPath()));
+      sourcePattern = Pattern.compile(NOT_IN_REMOTE.replace("{0}", Pattern.quote(source.getPath())));
     } else {
       throw new IllegalArgumentException("Unknown type '" + source.getType() + "'");
     }
 
     if (target.getType() == Type.LOCAL) {
-      targetPattern = Pattern.compile(NOT_IN_LOCAL.replace("{0}", target.getPath()));
+      targetPattern = Pattern.compile(NOT_IN_LOCAL.replace("{0}", Pattern.quote(target.getPath())));
     } else if (target.getType() == Type.REMOTE) {
-      targetPattern = Pattern.compile(NOT_IN_REMOTE.replace("{0}", target.getPath()));
+      targetPattern = Pattern.compile(NOT_IN_REMOTE.replace("{0}", Pattern.quote(target.getPath())));
     } else {
       throw new IllegalArgumentException("Unknown type '" + target.getType() + "'");
     }
