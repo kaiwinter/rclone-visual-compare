@@ -13,6 +13,9 @@ The current focus of this project is to compare directories which contain images
 ## Prerequisites
 - Java/JavaFX 11
 
+## Screenshot
+![Screenshot](../assets/screenshot.png?raw=true)
+
 ## TODO
 - FEATURES
   - Export of the result
