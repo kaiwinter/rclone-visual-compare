@@ -162,7 +162,7 @@ public class DiffController implements Initializable {
       return;
     }
 
-    String path = sourcePath.getText();
+    String path = syncFile.getSourcePath();
 
     if (isLocalPath(path)) {
       Path completeFilePath = Path.of(syncFile.getSourcePath()).resolve(syncFile.getFile());
@@ -181,7 +181,7 @@ public class DiffController implements Initializable {
       return;
     }
 
-    String path = targetPath.getText();
+    String path = syncFile.getTargetPath();
 
     if (isLocalPath(path)) {
       Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
@@ -296,7 +296,7 @@ public class DiffController implements Initializable {
   public void deleteSourceFile() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand =
-      new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), sourcePath.getText() + "/" + syncFile.getFile());
+      new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile.getSourcePath() + syncFile.getFile());
     deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
       model.getSourceOnly().remove(syncFile);
     }));
@@ -311,7 +311,7 @@ public class DiffController implements Initializable {
   public void deleteTargetFile() {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
     DeleteCommand deleteCommand =
-      new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), targetPath.getText() + "/" + syncFile.getFile());
+      new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile.getTargetPath() + syncFile.getFile());
     deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
       model.getTargetOnly().remove(syncFile);
     }));
