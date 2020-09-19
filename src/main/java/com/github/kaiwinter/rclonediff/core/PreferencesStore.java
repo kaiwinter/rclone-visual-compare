@@ -16,6 +16,7 @@ public class PreferencesStore {
   private static final String SOURCE_PATH_TYPE = "source.path.type";
   private static final String TARGET_PATH = "target.path";
   private static final String TARGET_PATH_TYPE = "target.path.type";
+  private static final String RCLONE_BINARY_PATH = "rclone.binary.path";
 
   /**
    * Saves a {@link SyncEndpoint} as source endpoint for later use.
@@ -59,5 +60,24 @@ public class PreferencesStore {
       return Optional.of(new SyncEndpoint(Type.valueOf(targetPathTypeFromPreferences), targetPathFromPreferences));
     }
     return Optional.empty();
+  }
+
+  /**
+   * @return the path to the rclone binary
+   */
+  public static Optional<String> loadRcloneBinaryPath() {
+    Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+    return Optional.ofNullable(pref.get(RCLONE_BINARY_PATH, null));
+  }
+
+  /**
+   * Saves the path to the rclone executable.
+   *
+   * @param rcloneBinaryPath
+   *          the path to the rclone executable
+   */
+  public static void saveRcloneBinaryPath(String rcloneBinaryPath) {
+    Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+    pref.put(RCLONE_BINARY_PATH, rcloneBinaryPath);
   }
 }

@@ -11,10 +11,6 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
 
-import com.dlsc.preferencesfx.PreferencesFx;
-import com.dlsc.preferencesfx.model.Category;
-import com.dlsc.preferencesfx.model.Setting;
-import com.github.kaiwinter.rclonediff.MainApplication;
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
@@ -27,12 +23,15 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -102,8 +101,6 @@ public class DiffController implements Initializable {
 
   private DiffModel model = new DiffModel();
 
-  private PreferencesFx preferencesFx;
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     sourceOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
@@ -153,9 +150,7 @@ public class DiffController implements Initializable {
 
     PreferencesStore.loadSourceEndpoint().ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
     PreferencesStore.loadTargetEndpoint().ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
-
-    preferencesFx =
-      PreferencesFx.of(MainApplication.class, Category.of("General", Setting.of("Path to rclone", model.getRcloneBinaryPath())));
+    PreferencesStore.loadRcloneBinaryPath().ifPresent(rcloneBinaryPath -> model.getRcloneBinaryPath().setValue(rcloneBinaryPath));
   }
 
   private void showImageFromSourcePath(SyncFile syncFile) {
@@ -391,7 +386,20 @@ public class DiffController implements Initializable {
 
   @FXML
   public void openPreferences() {
-    preferencesFx.show(true);
+    TextInputDialog dialog = new TextInputDialog(model.getRcloneBinaryPath().getValue());
+    dialog.setTitle("rclone binary path");
+    dialog.setHeaderText("rclone binary path");
+    dialog.setContentText("rclone binary path:");
 
+    // disable ok button if input is empty
+    BooleanBinding isValid = Bindings.createBooleanBinding(() -> dialog.getEditor().getText().isBlank(), dialog.getEditor().textProperty());
+    Node okButton = dialog.getDialogPane().lookupButton(ButtonType.OK);
+    okButton.disableProperty().bind(isValid);
+
+    Optional<String> result = dialog.showAndWait();
+    result.ifPresent(rcloneBinaryPath -> {
+      model.getRcloneBinaryPath().setValue(rcloneBinaryPath);
+      PreferencesStore.saveRcloneBinaryPath(rcloneBinaryPath);
+    });
   }
 }

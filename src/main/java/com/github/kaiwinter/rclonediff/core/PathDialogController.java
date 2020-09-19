@@ -61,7 +61,7 @@ public class PathDialogController {
       Dialog<SyncEndpoint> dialog = new Dialog<>();
       dialog.setTitle("Configure path");
 
-      BooleanBinding isPathValid = Bindings.createBooleanBinding(() -> path.getText().isEmpty(), path.textProperty());
+      BooleanBinding isPathValid = Bindings.createBooleanBinding(() -> path.getText().isBlank(), path.textProperty());
       BooleanBinding isTypeValid = Bindings.createBooleanBinding(() -> type.getSelectedToggle() == null, type.selectedToggleProperty());
 
       Node okButton = dialogPane.lookupButton(ButtonType.OK);
