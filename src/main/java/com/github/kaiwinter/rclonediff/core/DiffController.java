@@ -260,9 +260,9 @@ public class DiffController implements Initializable {
       sourceOnlyLabel.setText("Local only (" + sourceOnly.getItems().size() + ")");
       diffsLabel.setText("Different content (" + diffs.getItems().size() + ")");
       targetOnlyLabel.setText("Remote only (" + targetOnly.getItems().size() + ")");
+      diffButton.setText("Diff");
     }));
     checkCommand.start();
-    checkCommand.setOnSucceeded(event -> diffButton.setText("Diff"));
   }
 
   private Path getTempDirectoryLazy() {
