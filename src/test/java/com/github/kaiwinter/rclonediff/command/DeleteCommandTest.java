@@ -40,7 +40,7 @@ class DeleteCommandTest {
   void valid_command() throws IOException {
     Runtime runtime = mock(Runtime.class, Answers.RETURNS_MOCKS);
 
-    DeleteCommand deleteCommand = new DeleteCommand(runtime, "Dropbox:/backup/file1");
+    DeleteCommand deleteCommand = new DeleteCommand(runtime, "rclone", "Dropbox:/backup/file1");
     deleteCommand.createTask().run();
 
     verify(runtime).exec(eq("rclone delete \"Dropbox:/backup/file1\""));
@@ -54,7 +54,7 @@ class DeleteCommandTest {
     Process process = when(mock(Process.class).getErrorStream()).thenReturn(new ByteArrayInputStream(new byte[] {})).getMock();
     Runtime runtime = when(mock(Runtime.class).exec(anyString())).thenReturn(process).getMock();
 
-    DeleteCommand deleteCommand = new DeleteCommand(runtime, "Dropbox:/backup/file1");
+    DeleteCommand deleteCommand = new DeleteCommand(runtime, "rclone", "Dropbox:/backup/file1");
     deleteCommand.createTask().run();
 
     assertEquals(0, deleteCommand.getReturnCode());

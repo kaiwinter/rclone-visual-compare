@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CopyCommand extends AbstractCommand {
 
   private final Runtime runtime;
+  private final String rcloneBinaryPath;
   private final SyncFile syncFile;
 
   @Override
@@ -27,7 +28,7 @@ public class CopyCommand extends AbstractCommand {
   private void copyFileFromTo(String file, String fromPath, String toPath) throws IOException {
     String targetDirectory = toPath + file;
     targetDirectory = targetDirectory.substring(0, targetDirectory.lastIndexOf("/") + 1);
-    String command = "rclone copy \"" + fromPath + file + "\" \"" + targetDirectory + "\"";
+    String command = rcloneBinaryPath + " copy \"" + fromPath + file + "\" \"" + targetDirectory + "\"";
     log.info("Copy command: {}", command);
     consoleLog.add(command);
 

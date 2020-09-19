@@ -43,7 +43,7 @@ class CopyCommandTest {
     Runtime runtime = mock(Runtime.class, Answers.RETURNS_MOCKS);
     SyncFile syncFile = new SyncFile("Dropbox:/backup", "c:/systemp", "file.jpg");
 
-    CopyCommand copyCommand = new CopyCommand(runtime, syncFile);
+    CopyCommand copyCommand = new CopyCommand(runtime, "rclone", syncFile);
     copyCommand.createTask().run();
 
     verify(runtime).exec(eq("rclone copy \"Dropbox:/backup/file.jpg\" \"c:/systemp/\""));
@@ -59,7 +59,7 @@ class CopyCommandTest {
 
     SyncFile syncFile = new SyncFile("Dropbox:/backup", "c:/systemp", "file.jpg");
 
-    CopyCommand copyCommand = new CopyCommand(runtime, syncFile);
+    CopyCommand copyCommand = new CopyCommand(runtime, "rclone", syncFile);
     copyCommand.createTask().run();
 
     assertEquals(0, copyCommand.getReturnCode());

@@ -222,7 +222,7 @@ public class DiffController implements Initializable {
       showLocalFile(completeFilePath, targetImageView);
       return;
     }
-    CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), syncFile);
+    CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile);
     rcloneCopyService.setOnSucceeded(event -> {
 
       if (rcloneCopyService == model.getLatestCopyCommand()) {
@@ -295,7 +295,8 @@ public class DiffController implements Initializable {
   @FXML
   public void deleteSourceFile() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
-    DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), sourcePath.getText() + "/" + syncFile.getFile());
+    DeleteCommand deleteCommand =
+      new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), sourcePath.getText() + "/" + syncFile.getFile());
     deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
       model.getSourceOnly().remove(syncFile);
     }));
@@ -309,7 +310,8 @@ public class DiffController implements Initializable {
   @FXML
   public void deleteTargetFile() {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
-    DeleteCommand deleteCommand = new DeleteCommand(Runtime.getRuntime(), targetPath.getText() + "/" + syncFile.getFile());
+    DeleteCommand deleteCommand =
+      new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), targetPath.getText() + "/" + syncFile.getFile());
     deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
       model.getTargetOnly().remove(syncFile);
     }));
@@ -320,7 +322,7 @@ public class DiffController implements Initializable {
   @FXML
   public void copyToTarget() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
-    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFile);
+    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile);
     copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
       model.getSourceOnly().remove(syncFile);
     }));
@@ -331,7 +333,7 @@ public class DiffController implements Initializable {
   public void copyToSource() {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
     SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
-    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), syncFileInverse);
+    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFileInverse);
     copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
       model.getTargetOnly().remove(syncFile);
     }));

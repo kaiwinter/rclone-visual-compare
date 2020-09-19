@@ -15,11 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 public class DeleteCommand extends AbstractCommand {
 
   private final Runtime runtime;
+  private final String rcloneBinaryPath;
   private final String absoluteFilename;
 
   @Override
   protected void execute() throws IOException {
-    String command = "rclone delete \"" + absoluteFilename + "\"";
+    String command = rcloneBinaryPath + " delete \"" + absoluteFilename + "\"";
     log.info("Delete command: {}", command);
     consoleLog.add(command);
 
