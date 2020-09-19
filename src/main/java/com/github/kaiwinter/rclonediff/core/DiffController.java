@@ -367,7 +367,7 @@ public class DiffController implements Initializable {
   @FXML
   public void chooseSourcePath() throws IOException {
     PathDialogController pathDialogController = new PathDialogController(model.getSource().getValue());
-    Optional<SyncEndpoint> result = pathDialogController.getResult();
+    Optional<SyncEndpoint> result = pathDialogController.showAndWait();
     result.ifPresent(syncEndpoint -> {
       model.getSource().setValue(syncEndpoint);
       PreferencesStore.saveSourceEndpoint(syncEndpoint);
@@ -377,7 +377,7 @@ public class DiffController implements Initializable {
   @FXML
   public void chooseTargetPath() {
     PathDialogController pathDialogController = new PathDialogController(model.getTarget().getValue());
-    Optional<SyncEndpoint> result = pathDialogController.getResult();
+    Optional<SyncEndpoint> result = pathDialogController.showAndWait();
     result.ifPresent(syncEndpoint -> {
       model.getTarget().setValue(syncEndpoint);
       PreferencesStore.saveTargetEndpoint(syncEndpoint);

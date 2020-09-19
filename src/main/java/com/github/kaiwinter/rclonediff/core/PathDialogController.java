@@ -18,7 +18,6 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
-import lombok.Getter;
 
 /**
  * Controller of the path selection dialog. The Dialog is initialized and open by calling its
@@ -38,8 +37,7 @@ public class PathDialogController {
   @FXML
   private Toggle remoteToggle;
 
-  @Getter
-  private Optional<SyncEndpoint> result;
+  private Dialog<SyncEndpoint> dialog;
 
   /**
    * Constructs a new dialog to let the user select a {@link SyncEndpoint}.
@@ -58,7 +56,7 @@ public class PathDialogController {
         showCurrentSyncEndpoint(syncEndpoint);
       }
 
-      Dialog<SyncEndpoint> dialog = new Dialog<>();
+      dialog = new Dialog<>();
       dialog.setTitle("Configure path");
 
       BooleanBinding isPathValid = Bindings.createBooleanBinding(() -> path.getText().isBlank(), path.textProperty());
@@ -85,7 +83,6 @@ public class PathDialogController {
       });
       dialog.setDialogPane(dialogPane);
       Platform.runLater(() -> path.requestFocus());
-      result = dialog.showAndWait();
     } catch (IOException exception) {
       throw new RuntimeException(exception);
     }
@@ -98,5 +95,14 @@ public class PathDialogController {
     } else if (syncEndpoint.getType() == Type.REMOTE) {
       this.remoteToggle.setSelected(true);
     }
+  }
+
+  /**
+   * Shows the dialog and returns the result when the user confirms the dialog
+   *
+   * @return a valid {@link SyncEndpoint} or an empty optional
+   */
+  public Optional<SyncEndpoint> showAndWait() {
+    return dialog.showAndWait();
   }
 }
