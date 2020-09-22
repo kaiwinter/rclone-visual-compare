@@ -192,7 +192,12 @@ public class DiffController implements Initializable {
   }
 
   private boolean isImage(SyncFile syncFile) {
-    return syncFile.getFile().toLowerCase().endsWith(".jpg");
+    String fileExtension = syncFile.getFile().toLowerCase();
+    return fileExtension.endsWith(".jpg") //
+      || fileExtension.endsWith("jpeg") //
+      || fileExtension.endsWith("png") //
+      || fileExtension.endsWith("gif") //
+      || fileExtension.endsWith("bmp");
   }
 
   private boolean isLocalPath(String path) {

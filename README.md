@@ -19,7 +19,6 @@ The current focus of this project is to compare directories which contain images
 ## TODO
 - FEATURES
   - Export of the result
-  - show preview for different file types than jpg
   - Copy/delete operations for "different content" section
   - Show metadata for files (size etc.)
 
