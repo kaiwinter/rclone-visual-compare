@@ -1,5 +1,7 @@
 package com.github.kaiwinter.rclonediff.command;
 
+import static com.github.kaiwinter.rclonediff.util.StringUtils.wrapInQuotes;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,7 +30,7 @@ public class CopyCommand extends AbstractCommand {
   private void copyFileFromTo(String file, String fromPath, String toPath) throws IOException {
     String targetDirectory = toPath + file;
     targetDirectory = targetDirectory.substring(0, targetDirectory.lastIndexOf("/") + 1);
-    String command = rcloneBinaryPath + " copy \"" + fromPath + file + "\" \"" + targetDirectory + "\"";
+    String command = rcloneBinaryPath + " copy " + wrapInQuotes(fromPath + file) + " " + wrapInQuotes(targetDirectory);
     log.info("Copy command: {}", command);
     consoleLog.add(command);
 

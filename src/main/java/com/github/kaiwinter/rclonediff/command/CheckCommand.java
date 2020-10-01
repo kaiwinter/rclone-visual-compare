@@ -1,5 +1,7 @@
 package com.github.kaiwinter.rclonediff.command;
 
+import static com.github.kaiwinter.rclonediff.util.StringUtils.wrapInQuotes;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,7 +39,8 @@ public class CheckCommand extends AbstractCommand {
     SyncEndpoint source = model.getSource().getValue();
     SyncEndpoint target = model.getTarget().getValue();
 
-    String command = model.getRcloneBinaryPath().getValue() + " check " + source.getPath() + " " + target.getPath();
+    String command =
+      model.getRcloneBinaryPath().getValue() + " check " + wrapInQuotes(source.getPath()) + " " + wrapInQuotes(target.getPath());
     log.info("Check command: {}", command);
     consoleLog.add(command);
 

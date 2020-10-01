@@ -1,5 +1,7 @@
 package com.github.kaiwinter.rclonediff.command;
 
+import static com.github.kaiwinter.rclonediff.util.StringUtils.wrapInQuotes;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,7 +22,7 @@ public class DeleteCommand extends AbstractCommand {
 
   @Override
   protected void execute() throws IOException {
-    String command = rcloneBinaryPath + " delete \"" + absoluteFilename + "\"";
+    String command = rcloneBinaryPath + " delete " + wrapInQuotes(absoluteFilename);
     log.info("Delete command: {}", command);
     consoleLog.add(command);
 
