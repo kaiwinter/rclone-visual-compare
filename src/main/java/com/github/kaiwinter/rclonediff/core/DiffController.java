@@ -262,9 +262,9 @@ public class DiffController implements Initializable {
     progressIndicator.visibleProperty().bind(checkCommand.runningProperty());
 
     checkCommand.setOnSucceeded(new CommandSucceededEvent(checkCommand, () -> {
-      sourceOnlyLabel.setText("Local only (" + sourceOnly.getItems().size() + ")");
+      sourceOnlyLabel.setText("Source only (" + sourceOnly.getItems().size() + ")");
       diffsLabel.setText("Different content (" + diffs.getItems().size() + ")");
-      targetOnlyLabel.setText("Remote only (" + targetOnly.getItems().size() + ")");
+      targetOnlyLabel.setText("Target only (" + targetOnly.getItems().size() + ")");
       diffButton.setText("Diff");
     }));
     checkCommand.start();
