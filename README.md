@@ -28,3 +28,6 @@ The current focus of this project is to compare directories which contain images
   - Tree instead of ListView
   - Have multi-selection for file operations
   - Don't start second download of a remote image if a download of this image is in progress already
+
+- KNOWN ISSUES
+  - Using backslashes in paths breaks parsing of rclone check messages -> User have to use slashes (even on windows). This should be forced by the choose dialog.
