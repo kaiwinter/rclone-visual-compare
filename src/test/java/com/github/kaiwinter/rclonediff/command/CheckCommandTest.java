@@ -55,7 +55,7 @@ class CheckCommandTest {
     CheckCommand checkCommand = new CheckCommand(runtime, model);
     checkCommand.createTask().run();
 
-    verify(runtime).exec(eq("rclone check c:/temp/ Dropbox:/backup"));
+    verify(runtime).exec(eq("rclone check \"c:/temp/\" \"Dropbox:/backup\""));
   }
 
   /**
