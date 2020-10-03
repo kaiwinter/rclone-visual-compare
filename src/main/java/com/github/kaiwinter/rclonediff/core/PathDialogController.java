@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
@@ -36,6 +37,9 @@ public class PathDialogController {
 
   @FXML
   private Toggle remoteToggle;
+
+  @FXML
+  private Label slashesInfo;
 
   private Dialog<SyncEndpoint> dialog;
 
@@ -61,9 +65,12 @@ public class PathDialogController {
 
       BooleanBinding isPathValid = Bindings.createBooleanBinding(() -> path.getText().isBlank(), path.textProperty());
       BooleanBinding isTypeValid = Bindings.createBooleanBinding(() -> type.getSelectedToggle() == null, type.selectedToggleProperty());
+      BooleanBinding correctSlashes = Bindings.createBooleanBinding(() -> path.getText().contains("\\"), path.textProperty());
+
+      slashesInfo.visibleProperty().bind(correctSlashes);
 
       Node okButton = dialogPane.lookupButton(ButtonType.OK);
-      okButton.disableProperty().bind(isPathValid.or(isTypeValid));
+      okButton.disableProperty().bind(isPathValid.or(isTypeValid).or(correctSlashes));
 
       dialog.setResultConverter(buttonType -> {
 
