@@ -21,6 +21,8 @@ The current focus of this project is to compare directories which contain images
   - Export of the result
   - Copy/delete operations for "different content" section
   - Show metadata for files (size etc.)
+  - Ask for confirmation on file deletion (with option like "always yes")
+  - Bind counter in list titles to real number of items (they change on delete/copy operations)
 
 - TECHNICAL
   - Sorter/formatter for lists (SyncFile-Object)
@@ -28,6 +30,7 @@ The current focus of this project is to compare directories which contain images
   - Tree instead of ListView
   - Have multi-selection for file operations
   - Don't start second download of a remote image if a download of this image is in progress already
+  - "Copy to xyz": if source is remote and file was copied to local for preview already, copy the temp file instead of starting a new download
 
 - KNOWN ISSUES
   - Using backslashes in paths breaks parsing of rclone check messages -> User have to use slashes (even on windows). This should be forced by the choose dialog.
