@@ -25,7 +25,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -300,13 +303,20 @@ public class DiffController implements Initializable {
   @FXML
   public void deleteSourceFile() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
-    DeleteCommand deleteCommand =
-      new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile.getSourcePath() + syncFile.getFile());
-    deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
-      model.getSourceOnly().remove(syncFile);
-    }));
+    boolean delete = model.isAlwaysDelete();
+    if (!delete) {
+      delete = askForDeleteConfirmation(syncFile.getFile());
+    }
 
-    deleteCommand.start();
+    if (delete) {
+      DeleteCommand deleteCommand =
+        new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile.getSourcePath() + syncFile.getFile());
+      deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
+        model.getSourceOnly().remove(syncFile);
+      }));
+
+      deleteCommand.start();
+    }
   }
 
   /**
@@ -315,14 +325,44 @@ public class DiffController implements Initializable {
   @FXML
   public void deleteTargetFile() {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
-    DeleteCommand deleteCommand =
-      new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile.getTargetPath() + syncFile.getFile());
-    deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
-      model.getTargetOnly().remove(syncFile);
-    }));
+    boolean delete = model.isAlwaysDelete();
+    if (!delete) {
+      delete = askForDeleteConfirmation(syncFile.getFile());
+    }
 
-    deleteCommand.start();
+    if (delete) {
+      DeleteCommand deleteCommand =
+        new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile.getTargetPath() + syncFile.getFile());
+      deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
+        model.getTargetOnly().remove(syncFile);
+      }));
+
+      deleteCommand.start();
+    }
   }
+
+  private boolean askForDeleteConfirmation(String filename) {
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Delete confirmation");
+    alert.setHeaderText("Do you really want to delete '" + filename + "'");
+    alert.setContentText("Please confirm the deletion of the file. You can choose 'Yes, always' to suppress any further confirmations.");
+
+    ButtonType buttonYes = new ButtonType("Yes");
+    ButtonType buttonYesAlways = new ButtonType("Yes, always");
+    ButtonType buttonNo = new ButtonType("No, cancel", ButtonData.CANCEL_CLOSE);
+
+    alert.getButtonTypes().setAll(buttonYes, buttonYesAlways, buttonNo);
+
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.get() == buttonYes) {
+      return true;
+    } else if (result.get() == buttonYesAlways) {
+      model.setAlwaysDelete(true);
+      return true;
+    }
+    return false;
+  }
+
 
   @FXML
   public void copyToTarget() {

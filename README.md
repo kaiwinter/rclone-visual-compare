@@ -21,7 +21,6 @@ The current focus of this project is to compare directories which contain images
   - Export of the result
   - Copy/delete operations for "different content" section
   - Show metadata for files (size etc.)
-  - Ask for confirmation on file deletion (with option like "always yes")
   - Bind counter in list titles to real number of items (they change on delete/copy operations)
 
 - TECHNICAL

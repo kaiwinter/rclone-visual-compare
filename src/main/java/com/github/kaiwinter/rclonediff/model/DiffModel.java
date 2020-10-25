@@ -34,4 +34,7 @@ public class DiffModel {
   private CheckCommand runningCheckCommand;
 
   private CopyCommand latestCopyCommand;
+
+  /** If false, the user gets asked before any delete operation. */
+  private boolean alwaysDelete = false;
 }
