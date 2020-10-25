@@ -396,6 +396,9 @@ public class DiffController implements Initializable {
   }
 
   private void showImageLarge(Image image) {
+    if (image == null) {
+      return;
+    }
     StackPane root = new StackPane();
 
     Stage stage = new Stage();
