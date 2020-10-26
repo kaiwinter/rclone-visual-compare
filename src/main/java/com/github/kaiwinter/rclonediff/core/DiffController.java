@@ -98,6 +98,12 @@ public class DiffController implements Initializable {
   private Button copyToSourceButton;
 
   @FXML
+  private Button copyToTargetFromDiffButton;
+
+  @FXML
+  private Button copyToSourceFromDiffButton;
+
+  @FXML
   private ProgressIndicator progressIndicator;
 
   private Path tempDirectory;
@@ -127,6 +133,9 @@ public class DiffController implements Initializable {
 
     copyToTargetButton.disableProperty().bind(sourceOnlyBinding);
     copyToSourceButton.disableProperty().bind(targetOnlyBinding);
+
+    copyToTargetFromDiffButton.disableProperty().bind(Bindings.isEmpty(diffs.getSelectionModel().getSelectedItems()));
+    copyToSourceFromDiffButton.disableProperty().bind(Bindings.isEmpty(diffs.getSelectionModel().getSelectedItems()));
 
     StringConverter<SyncEndpoint> converter = new StringConverter<>() {
 
@@ -381,6 +390,27 @@ public class DiffController implements Initializable {
     CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFileInverse);
     copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
       model.getTargetOnly().remove(syncFile);
+    }));
+    copyCommand.start();
+  }
+
+  @FXML
+  public void copyToTargetFromDiff() {
+    SyncFile syncFile = diffs.getSelectionModel().selectedItemProperty().get();
+    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile);
+    copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
+      model.getContentDifferent().remove(syncFile);
+    }));
+    copyCommand.start();
+  }
+
+  @FXML
+  public void copyToSourceFromDiff() {
+    SyncFile syncFile = diffs.getSelectionModel().selectedItemProperty().get();
+    SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
+    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFileInverse);
+    copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
+      model.getContentDifferent().remove(syncFile);
     }));
     copyCommand.start();
   }

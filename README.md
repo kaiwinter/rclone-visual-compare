@@ -19,7 +19,6 @@ The current focus of this project is to compare directories which contain images
 ## TODO
 - FEATURES
   - Export of the result
-  - Copy/delete operations for "different content" section
   - Show metadata for files (size etc.)
   - Bind counter in list titles to real number of items (they change on delete/copy operations)
 

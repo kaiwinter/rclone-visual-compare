@@ -86,6 +86,12 @@
                         <Button fx:id="copyToSourceButton" mnemonicParsing="false" onAction="#copyToSource" text="Copy to Source" />
                      </children>
                   </HBox>
+                  <HBox prefWidth="0.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <children>
+                        <Button fx:id="copyToTargetFromDiffButton" mnemonicParsing="false" onAction="#copyToTargetFromDiff" text="Copy source to target" />
+                        <Button fx:id="copyToSourceFromDiffButton" mnemonicParsing="false" onAction="#copyToSourceFromDiff" text="Copy target to source" />
+                     </children>
+                  </HBox>
                </children>
             </GridPane>
          </children>
