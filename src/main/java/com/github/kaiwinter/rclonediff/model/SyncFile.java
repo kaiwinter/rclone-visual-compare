@@ -23,6 +23,16 @@ public class SyncFile {
    */
   private final String file;
 
+  /**
+   * Constructs a new {@link SyncFile} with a normalized path (ending with an "/").
+   *
+   * @param sourcePath
+   *          the source path
+   * @param targetPath
+   *          the target path
+   * @param file
+   *          the file
+   */
   public SyncFile(String sourcePath, String targetPath, String file) {
     if (!sourcePath.endsWith("/")) {
       sourcePath = sourcePath + "/";

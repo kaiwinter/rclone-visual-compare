@@ -11,7 +11,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
+/**
+ * Utility class to build {@link Alert} dialogs for specific use cases.
+ */
 public class AlertDialogBuilder {
+
+  private AlertDialogBuilder() {
+    // Utility Class
+  }
 
   /**
    * Creates an {@link Alert} dialog which contains logging output. This output is taken from the

@@ -45,6 +45,9 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * The controller class of the view RcloneDiff.
+ */
 @Slf4j
 public class DiffController implements Initializable {
 
@@ -254,6 +257,9 @@ public class DiffController implements Initializable {
     model.setLatestCopyCommand(rcloneCopyService);
   }
 
+  /**
+   * Called to start a rclone check of the two selected paths.
+   */
   @FXML
   public void diff() {
     // re-use diff button as cancel button
@@ -374,7 +380,9 @@ public class DiffController implements Initializable {
     return false;
   }
 
-
+  /**
+   * Called to copy a file selected on the source side to the target side.
+   */
   @FXML
   public void copyToTarget() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
@@ -385,6 +393,9 @@ public class DiffController implements Initializable {
     serviceFactory.createService(model.getRcloneBinaryPath().getValue(), copyCommand).start();
   }
 
+  /**
+   * Called to copy a file selected on the target side to the source side.
+   */
   @FXML
   public void copyToSource() {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
@@ -396,6 +407,9 @@ public class DiffController implements Initializable {
     serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), copyCommand);
   }
 
+  /**
+   * Called to copy a file selected in the "different content" list to the target side.
+   */
   @FXML
   public void copyToTargetFromDiff() {
     SyncFile syncFile = diffs.getSelectionModel().selectedItemProperty().get();
@@ -406,6 +420,9 @@ public class DiffController implements Initializable {
     serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), copyCommand);
   }
 
+  /**
+   * Called to copy a file selected in the "different content" list to the source side.
+   */
   @FXML
   public void copyToSourceFromDiff() {
     SyncFile syncFile = diffs.getSelectionModel().selectedItemProperty().get();
@@ -417,11 +434,17 @@ public class DiffController implements Initializable {
     serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), copyCommand);
   }
 
+  /**
+   * Called to show the selected image from the source side.
+   */
   @FXML
   public void showSourceImageLarge() {
     showImageLarge(sourceOnlyImage.getImage());
   }
 
+  /**
+   * Called to show the selected image from the target side.
+   */
   @FXML
   public void showTargetImageLarge() {
     showImageLarge(targetOnlyImage.getImage());
@@ -446,8 +469,11 @@ public class DiffController implements Initializable {
     stage.show();
   }
 
+  /**
+   * Called to open the dialog to choose the source path.
+   */
   @FXML
-  public void chooseSourcePath() throws IOException {
+  public void chooseSourcePath() {
     PathDialogController pathDialogController = new PathDialogController(model.getSource().getValue());
     Optional<SyncEndpoint> result = pathDialogController.showAndWait();
     result.ifPresent(syncEndpoint -> {
@@ -456,6 +482,9 @@ public class DiffController implements Initializable {
     });
   }
 
+  /**
+   * Called to open the dialog to choose the target path.
+   */
   @FXML
   public void chooseTargetPath() {
     PathDialogController pathDialogController = new PathDialogController(model.getTarget().getValue());
@@ -466,6 +495,9 @@ public class DiffController implements Initializable {
     });
   }
 
+  /**
+   * Called to open the preferences dialog.
+   */
   @FXML
   public void openPreferences() {
     TextInputDialog dialog = new TextInputDialog(model.getRcloneBinaryPath().getValue());

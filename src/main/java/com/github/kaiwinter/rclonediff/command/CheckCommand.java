@@ -28,6 +28,12 @@ public class CheckCommand extends AbstractCommand {
   private final Pattern sourcePattern;
   private final Pattern targetPattern;
 
+  /**
+   * Constructs a new {@link CheckCommand} and initializes regular expressions to parse rclone output.
+   *
+   * @param model
+   *          the {@link DiffModel}
+   */
   public CheckCommand(DiffModel model) {
     this.model = model;
 

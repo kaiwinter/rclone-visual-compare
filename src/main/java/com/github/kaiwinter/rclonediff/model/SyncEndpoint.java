@@ -12,12 +12,18 @@ public class SyncEndpoint {
    * Whether it is a local or a remote endpoint.
    */
   public enum Type {
-    LOCAL, REMOTE;
+    /** A local path. */
+    LOCAL,
+    /** A rclone remote. */
+    REMOTE;
   }
 
   private final Type type;
   private final String path;
 
+  /**
+   * @return a UI representation of this {@link SyncEndpoint}
+   */
   public String toUiString() {
     return path + " (" + type + ")";
   }

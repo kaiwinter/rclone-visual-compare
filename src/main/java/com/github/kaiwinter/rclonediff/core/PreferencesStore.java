@@ -42,6 +42,11 @@ public class PreferencesStore {
     pref.put(TARGET_PATH, syncEndpoint.getPath());
   }
 
+  /**
+   * Loads a previously saved source {@link SyncEndpoint}.
+   *
+   * @return source {@link SyncEndpoint} or empty Optional
+   */
   public static Optional<SyncEndpoint> loadSourceEndpoint() {
     Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
     String sourcePathTypeFromPreferences = pref.get(SOURCE_PATH_TYPE, null);
@@ -52,6 +57,11 @@ public class PreferencesStore {
     return Optional.empty();
   }
 
+  /**
+   * Loads a previously saved target {@link SyncEndpoint}.
+   *
+   * @return target {@link SyncEndpoint} or empty Optional
+   */
   public static Optional<SyncEndpoint> loadTargetEndpoint() {
     Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
     String targetPathTypeFromPreferences = pref.get(TARGET_PATH_TYPE, null);
