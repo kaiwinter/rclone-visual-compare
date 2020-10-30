@@ -18,7 +18,7 @@ class CopyCommandTest {
   void valid_command() {
     SyncFile syncFile = new SyncFile("Dropbox:/backup", "c:/systemp", "file.jpg");
 
-    CopyCommand copyCommand = new CopyCommand("rclone", syncFile);
-    assertEquals("rclone copy \"Dropbox:/backup/file.jpg\" \"c:/systemp/\"", copyCommand.getCommandline());
+    CopyCommand copyCommand = new CopyCommand(syncFile);
+    assertEquals("copy \"Dropbox:/backup/file.jpg\" \"c:/systemp/\"", copyCommand.getCommandline());
   }
 }

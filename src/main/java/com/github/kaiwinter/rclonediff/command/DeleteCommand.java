@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DeleteCommand extends AbstractCommand {
 
-  private final String rcloneBinaryPath;
   private final String absoluteFilename;
 
   @Override
@@ -20,7 +19,7 @@ public class DeleteCommand extends AbstractCommand {
 
   @Override
   protected String getCommandline() {
-    return rcloneBinaryPath + " delete " + wrapInQuotes(absoluteFilename);
+    return "delete " + wrapInQuotes(absoluteFilename);
   }
 
   @Override

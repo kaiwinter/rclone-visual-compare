@@ -16,7 +16,7 @@ class DeleteCommandTest {
    */
   @Test
   void valid_command() throws IOException {
-    DeleteCommand deleteCommand = new DeleteCommand("rclone", "Dropbox:/backup/file1");
-    assertEquals("rclone delete \"Dropbox:/backup/file1\"", deleteCommand.getCommandline());
+    DeleteCommand deleteCommand = new DeleteCommand("Dropbox:/backup/file1");
+    assertEquals("delete \"Dropbox:/backup/file1\"", deleteCommand.getCommandline());
   }
 }

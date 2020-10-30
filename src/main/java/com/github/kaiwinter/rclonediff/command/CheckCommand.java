@@ -63,7 +63,7 @@ public class CheckCommand extends AbstractCommand {
     SyncEndpoint source = model.getSource().getValue();
     SyncEndpoint target = model.getTarget().getValue();
 
-    return model.getRcloneBinaryPath().getValue() + " check " + wrapInQuotes(source.getPath()) + " " + wrapInQuotes(target.getPath());
+    return "check " + wrapInQuotes(source.getPath()) + " " + wrapInQuotes(target.getPath());
   }
 
   @Override

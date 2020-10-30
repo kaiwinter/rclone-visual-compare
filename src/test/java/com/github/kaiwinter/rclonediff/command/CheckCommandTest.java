@@ -54,7 +54,7 @@ class CheckCommandTest {
     model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
 
     CheckCommand checkCommand = new CheckCommand(model);
-    assertEquals("rclone check \"c:/temp/\" \"Dropbox:/backup\"", checkCommand.getCommandline());
+    assertEquals("check \"c:/temp/\" \"Dropbox:/backup\"", checkCommand.getCommandline());
   }
 
   /**

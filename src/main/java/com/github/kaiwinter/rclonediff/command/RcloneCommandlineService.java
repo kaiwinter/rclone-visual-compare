@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RcloneCommandlineService extends Service<Void> {
 
   private final Runtime runtime;
+  private final String rcloneBinaryPath;
   private final AbstractCommand command;
 
   /**
@@ -75,7 +76,7 @@ public class RcloneCommandlineService extends Service<Void> {
   }
 
   private void executeCommand() throws IOException {
-    String commandline = command.getCommandline();
+    String commandline = String.join(" ", rcloneBinaryPath, command.getCommandline());
 
     log.info("Command: {}", commandline);
     consoleLog.add(commandline);

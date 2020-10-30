@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CopyCommand extends AbstractCommand {
 
-  private final String rcloneBinaryPath;
   private final SyncFile syncFile;
 
   @Override
@@ -27,7 +26,7 @@ public class CopyCommand extends AbstractCommand {
     String toPath = syncFile.getTargetPath();
     String targetDirectory = toPath + file;
     targetDirectory = targetDirectory.substring(0, targetDirectory.lastIndexOf("/") + 1);
-    return rcloneBinaryPath + " copy " + wrapInQuotes(fromPath + file) + " " + wrapInQuotes(targetDirectory);
+    return "copy " + wrapInQuotes(fromPath + file) + " " + wrapInQuotes(targetDirectory);
   }
 
   @Override
