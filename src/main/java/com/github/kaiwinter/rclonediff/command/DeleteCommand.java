@@ -2,46 +2,29 @@ package com.github.kaiwinter.rclonediff.command;
 
 import static com.github.kaiwinter.rclonediff.util.StringUtils.wrapInQuotes;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Executes a rclone delete command.
  */
-@Slf4j
 @RequiredArgsConstructor
 public class DeleteCommand extends AbstractCommand {
 
-  private final Runtime runtime;
   private final String rcloneBinaryPath;
   private final String absoluteFilename;
 
   @Override
-  protected void execute() throws IOException {
-    String command = rcloneBinaryPath + " delete " + wrapInQuotes(absoluteFilename);
-    log.info("Delete command: {}", command);
-    consoleLog.add(command);
-
-    Process process = runtime.exec(command);
-    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-    String line;
-    while ((line = reader.readLine()) != null) {
-      log.error(line);
-      consoleLog.add(line);
-    }
-    wait(process);
-
-    returnCode = process.exitValue();
-    log.info("rclone return code: {}", returnCode);
+  public int[] getExpectedReturnCodes() {
+    return new int[] {0};
   }
 
   @Override
-  public int[] getExpectedReturnCodes() {
-    return new int[] {0};
+  protected String getCommandline() {
+    return rcloneBinaryPath + " delete " + wrapInQuotes(absoluteFilename);
+  }
+
+  @Override
+  protected void handleRcloneOutput(String line) {
+    // noop
   }
 }

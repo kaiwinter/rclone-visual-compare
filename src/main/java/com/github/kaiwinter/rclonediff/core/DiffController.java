@@ -12,8 +12,10 @@ import java.util.ResourceBundle;
 import org.apache.commons.io.FileUtils;
 
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
+import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
+import com.github.kaiwinter.rclonediff.command.RcloneCommandlineService;
 import com.github.kaiwinter.rclonediff.model.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
@@ -109,6 +111,8 @@ public class DiffController implements Initializable {
   private Path tempDirectory;
 
   private DiffModel model = new DiffModel();
+
+  private RcloneCommandlineServiceFactory serviceFactory = new RcloneCommandlineServiceFactory(Runtime.getRuntime());
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -239,15 +243,14 @@ public class DiffController implements Initializable {
       showLocalFile(completeFilePath, targetImageView);
       return;
     }
-    CopyCommand rcloneCopyService = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile);
-    rcloneCopyService.setOnSucceeded(event -> {
+    CopyCommand rcloneCopyService = new CopyCommand(model.getRcloneBinaryPath().getValue(), syncFile);
+    rcloneCopyService.setCommandSucceededEvent(() -> {
 
       if (rcloneCopyService == model.getLatestCopyCommand()) {
         showLocalFile(completeFilePath, targetImageView);
-        event.consume();
       }
     });
-    rcloneCopyService.start();
+    serviceFactory.createServiceAndStart(rcloneCopyService);
     model.setLatestCopyCommand(rcloneCopyService);
   }
 
@@ -264,22 +267,23 @@ public class DiffController implements Initializable {
     model.getContentDifferent().clear();
     model.getTargetOnly().clear();
 
-    CheckCommand checkCommand = new CheckCommand(Runtime.getRuntime(), model);
-    model.setRunningCheckCommand(checkCommand);
+    CheckCommand checkCommand = new CheckCommand(model);
+    RcloneCommandlineService checkService = serviceFactory.createService(checkCommand);
+    model.setRunningCheckCommand(checkService);
 
-    sourcePath.disableProperty().bind(checkCommand.runningProperty());
-    targetPath.disableProperty().bind(checkCommand.runningProperty());
-    sourceChooseButton.disableProperty().bind(checkCommand.runningProperty());
-    targetChooseButton.disableProperty().bind(checkCommand.runningProperty());
-    progressIndicator.visibleProperty().bind(checkCommand.runningProperty());
+    sourcePath.disableProperty().bind(checkService.runningProperty());
+    targetPath.disableProperty().bind(checkService.runningProperty());
+    sourceChooseButton.disableProperty().bind(checkService.runningProperty());
+    targetChooseButton.disableProperty().bind(checkService.runningProperty());
+    progressIndicator.visibleProperty().bind(checkService.runningProperty());
 
-    checkCommand.setOnSucceeded(new CommandSucceededEvent(checkCommand, () -> {
+    checkCommand.setCommandSucceededEvent(() -> {
       sourceOnlyLabel.setText("Source only (" + sourceOnly.getItems().size() + ")");
       diffsLabel.setText("Different content (" + diffs.getItems().size() + ")");
       targetOnlyLabel.setText("Target only (" + targetOnly.getItems().size() + ")");
       diffButton.setText("Diff");
-    }));
-    checkCommand.start();
+    });
+    checkService.start();
   }
 
   private Path getTempDirectoryLazy() {
@@ -319,12 +323,12 @@ public class DiffController implements Initializable {
 
     if (delete) {
       DeleteCommand deleteCommand =
-        new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile.getSourcePath() + syncFile.getFile());
-      deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
+        new DeleteCommand(model.getRcloneBinaryPath().getValue(), syncFile.getSourcePath() + syncFile.getFile());
+      deleteCommand.setCommandSucceededEvent(() -> {
         model.getSourceOnly().remove(syncFile);
-      }));
+      });
 
-      deleteCommand.start();
+      serviceFactory.createServiceAndStart(deleteCommand);
     }
   }
 
@@ -341,12 +345,12 @@ public class DiffController implements Initializable {
 
     if (delete) {
       DeleteCommand deleteCommand =
-        new DeleteCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile.getTargetPath() + syncFile.getFile());
-      deleteCommand.setOnSucceeded(new CommandSucceededEvent(deleteCommand, () -> {
+        new DeleteCommand(model.getRcloneBinaryPath().getValue(), syncFile.getTargetPath() + syncFile.getFile());
+      deleteCommand.setCommandSucceededEvent(() -> {
         model.getTargetOnly().remove(syncFile);
-      }));
+      });
 
-      deleteCommand.start();
+      serviceFactory.createServiceAndStart(deleteCommand);
     }
   }
 
@@ -376,43 +380,43 @@ public class DiffController implements Initializable {
   @FXML
   public void copyToTarget() {
     SyncFile syncFile = sourceOnly.getSelectionModel().selectedItemProperty().get();
-    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile);
-    copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
+    CopyCommand copyCommand = new CopyCommand(model.getRcloneBinaryPath().getValue(), syncFile);
+    copyCommand.setCommandSucceededEvent(() -> {
       model.getSourceOnly().remove(syncFile);
-    }));
-    copyCommand.start();
+    });
+    serviceFactory.createService(copyCommand).start();
   }
 
   @FXML
   public void copyToSource() {
     SyncFile syncFile = targetOnly.getSelectionModel().selectedItemProperty().get();
     SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
-    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFileInverse);
-    copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
+    CopyCommand copyCommand = new CopyCommand(model.getRcloneBinaryPath().getValue(), syncFileInverse);
+    copyCommand.setCommandSucceededEvent(() -> {
       model.getTargetOnly().remove(syncFile);
-    }));
-    copyCommand.start();
+    });
+    serviceFactory.createServiceAndStart(copyCommand);
   }
 
   @FXML
   public void copyToTargetFromDiff() {
     SyncFile syncFile = diffs.getSelectionModel().selectedItemProperty().get();
-    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFile);
-    copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
+    CopyCommand copyCommand = new CopyCommand(model.getRcloneBinaryPath().getValue(), syncFile);
+    copyCommand.setCommandSucceededEvent(() -> {
       model.getContentDifferent().remove(syncFile);
-    }));
-    copyCommand.start();
+    });
+    serviceFactory.createServiceAndStart(copyCommand);
   }
 
   @FXML
   public void copyToSourceFromDiff() {
     SyncFile syncFile = diffs.getSelectionModel().selectedItemProperty().get();
     SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
-    CopyCommand copyCommand = new CopyCommand(Runtime.getRuntime(), model.getRcloneBinaryPath().getValue(), syncFileInverse);
-    copyCommand.setOnSucceeded(new CommandSucceededEvent(copyCommand, () -> {
+    CopyCommand copyCommand = new CopyCommand(model.getRcloneBinaryPath().getValue(), syncFileInverse);
+    copyCommand.setCommandSucceededEvent(() -> {
       model.getContentDifferent().remove(syncFile);
-    }));
-    copyCommand.start();
+    });
+    serviceFactory.createServiceAndStart(copyCommand);
   }
 
   @FXML

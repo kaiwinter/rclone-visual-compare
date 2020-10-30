@@ -1,68 +1,32 @@
 package com.github.kaiwinter.rclonediff.command;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.github.kaiwinter.rclonediff.ui.AlertDialogBuilder;
-
-import javafx.application.Platform;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-import javafx.scene.control.Alert;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Parent class for rclone commands.
+ * Parent class for rclone commands. The implementation have to provide the command line which gets
+ * run ({@link #getCommandline()}) and have to handle the output of the rclone command line-wise by
+ * {@link #handleRcloneOutput(String)}.
  */
-public abstract class AbstractCommand extends Service<Void> {
+public abstract class AbstractCommand {
 
-  /**
-   * Return code of the rclone command. Set to -1 so implementations have to set it properly.
-   */
+  @Setter
   @Getter
-  protected int returnCode = -1;
+  private Runnable commandSucceededEvent;
 
   /**
-   * Implementations can store console log into this list.
+   * @return the command line which gets executed by this command
    */
-  @Getter
-  protected List<String> consoleLog = new ArrayList<>();
-
-  @Override
-  protected Task<Void> createTask() {
-    // Exceptions which are thrown from this service should be shown as an Alert dialog to the user
-    this.setOnFailed(event -> {
-      Throwable exception = event.getSource().getException();
-      Alert alert = AlertDialogBuilder.buildExceptionDialog(exception);
-      Platform.runLater(() -> alert.showAndWait());
-    });
-
-    return new Task<>() {
-      @Override
-      protected Void call() throws Exception {
-        execute();
-        return null;
-      }
-    };
-  }
-
-  protected static void wait(Process process) {
-    try {
-      process.waitFor();
-    } catch (InterruptedException exception) {
-      Alert alert = AlertDialogBuilder.buildExceptionDialog(exception);
-      Platform.runLater(() -> alert.showAndWait());
-    }
-  }
+  protected abstract String getCommandline();
 
   /**
-   * Executes this service (this command).
+   * This method takes the output of the rclone command (line-wise) and interprets it for this
+   * command.
    *
-   * @throws IOException
-   *           if executing the rclone command fails
+   * @param line
+   *          the current output
    */
-  protected abstract void execute() throws IOException;
+  protected abstract void handleRcloneOutput(String line);
 
   /**
    * A successful rclone command returns mostly a 0 as successful return code. But some commands

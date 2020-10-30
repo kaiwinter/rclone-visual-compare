@@ -1,6 +1,5 @@
 package com.github.kaiwinter.rclonediff.model;
 
-import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.core.DiffController;
 
@@ -10,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
 import lombok.Data;
 
 /**
@@ -31,7 +31,7 @@ public class DiffModel {
   /** Files which are on the target side only. */
   private ObservableList<SyncFile> targetOnly = FXCollections.observableArrayList();
 
-  private CheckCommand runningCheckCommand;
+  private Service<Void> runningCheckCommand;
 
   private CopyCommand latestCopyCommand;
 
