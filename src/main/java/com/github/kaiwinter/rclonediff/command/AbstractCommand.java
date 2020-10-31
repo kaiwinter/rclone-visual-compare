@@ -17,7 +17,7 @@ public abstract class AbstractCommand {
   /**
    * @return the command line which gets executed by this command
    */
-  protected abstract String getCommandline();
+  public abstract String getCommandline();
 
   /**
    * This method takes the output of the rclone command (line-wise) and interprets it for this

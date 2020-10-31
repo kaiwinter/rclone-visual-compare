@@ -18,7 +18,7 @@ public class DeleteCommand extends AbstractCommand {
   }
 
   @Override
-  protected String getCommandline() {
+  public String getCommandline() {
     return "delete " + wrapInQuotes(absoluteFilename);
   }
 

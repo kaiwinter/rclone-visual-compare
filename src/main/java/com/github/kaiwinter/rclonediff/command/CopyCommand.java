@@ -20,7 +20,7 @@ public class CopyCommand extends AbstractCommand {
   }
 
   @Override
-  protected String getCommandline() {
+  public String getCommandline() {
     String file = syncFile.getFile();
     String fromPath = syncFile.getSourcePath();
     String toPath = syncFile.getTargetPath();

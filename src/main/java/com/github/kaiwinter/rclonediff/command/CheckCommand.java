@@ -65,7 +65,7 @@ public class CheckCommand extends AbstractCommand {
   }
 
   @Override
-  protected String getCommandline() {
+  public String getCommandline() {
     SyncEndpoint source = model.getSource().getValue();
     SyncEndpoint target = model.getTarget().getValue();
 
