@@ -2,17 +2,13 @@ package com.github.kaiwinter.rclonediff.core;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
 
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
-import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineService;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
 import com.github.kaiwinter.rclonediff.model.DiffModel;
@@ -122,14 +118,14 @@ public class DiffController implements Initializable {
     targetOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
 
     diffs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-      showImageFromSourcePath(newValue);
-      showImageFromTargetPath(newValue);
+      diffService.showImageFromSourcePath(newValue, model.sourceImageProperty(), model);
+      diffService.showImageFromTargetPath(newValue, model.targetImageProperty(), model);
     });
 
     sourceOnly.getSelectionModel().selectedItemProperty()
-      .addListener((observable, oldValue, newValue) -> showImageFromSourcePath(newValue));
+      .addListener((observable, oldValue, newValue) -> diffService.showImageFromSourcePath(newValue, model.sourceImageProperty(), model));
     targetOnly.getSelectionModel().selectedItemProperty()
-      .addListener((observable, oldValue, newValue) -> showImageFromTargetPath(newValue));
+      .addListener((observable, oldValue, newValue) -> diffService.showImageFromTargetPath(newValue, model.targetImageProperty(), model));
 
     BooleanBinding sourceOnlyBinding = Bindings.isEmpty(sourceOnly.getSelectionModel().getSelectedItems());
     BooleanBinding targetOnlyBinding = Bindings.isEmpty(targetOnly.getSelectionModel().getSelectedItems());
@@ -165,6 +161,9 @@ public class DiffController implements Initializable {
     model.selectedTargetFileProperty().bind(targetOnly.getSelectionModel().selectedItemProperty());
     model.selectedDiffFileProperty().bind(diffs.getSelectionModel().selectedItemProperty());
 
+    Bindings.bindBidirectional(sourceOnlyImage.imageProperty(), model.sourceImageProperty());
+    Bindings.bindBidirectional(targetOnlyImage.imageProperty(), model.targetImageProperty());
+
     sourceOnly.setItems(model.getSourceOnly());
     diffs.setItems(model.getContentDifferent());
     targetOnly.setItems(model.getTargetOnly());
@@ -172,91 +171,6 @@ public class DiffController implements Initializable {
     PreferencesStore.loadSourceEndpoint().ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
     PreferencesStore.loadTargetEndpoint().ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
     PreferencesStore.loadRcloneBinaryPath().ifPresent(rcloneBinaryPath -> model.getRcloneBinaryPath().setValue(rcloneBinaryPath));
-  }
-
-  private void showImageFromSourcePath(SyncFile syncFile) {
-    sourceOnlyImage.setImage(null);
-    if (syncFile == null) {
-      return;
-    }
-    if (!isImage(syncFile)) {
-      return;
-    }
-
-    String path = syncFile.getSourcePath();
-
-    if (isLocalPath(path)) {
-      Path completeFilePath = Path.of(syncFile.getSourcePath()).resolve(syncFile.getFile());
-      showLocalFile(completeFilePath, sourceOnlyImage);
-    } else {
-      showRemoteFile(new SyncFile(syncFile.getSourcePath(), getTempDirectoryLazy().toString(), syncFile.getFile()), sourceOnlyImage);
-    }
-  }
-
-  private void showImageFromTargetPath(SyncFile syncFile) {
-    targetOnlyImage.setImage(null);
-    if (syncFile == null) {
-      return;
-    }
-    if (!isImage(syncFile)) {
-      return;
-    }
-
-    String path = syncFile.getTargetPath();
-
-    if (isLocalPath(path)) {
-      Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
-      showLocalFile(completeFilePath, targetOnlyImage);
-    } else {
-      showRemoteFile(new SyncFile(syncFile.getTargetPath(), getTempDirectoryLazy().toString(), syncFile.getFile()), targetOnlyImage);
-    }
-  }
-
-  private boolean isImage(SyncFile syncFile) {
-    String fileExtension = syncFile.getFile().toLowerCase();
-    return fileExtension.endsWith(".jpg") //
-      || fileExtension.endsWith(".jpeg") //
-      || fileExtension.endsWith(".png") //
-      || fileExtension.endsWith(".gif") //
-      || fileExtension.endsWith(".bmp");
-  }
-
-  private boolean isLocalPath(String path) {
-    try {
-      Paths.get(path);
-    } catch (InvalidPathException | NullPointerException ex) {
-      return false;
-    }
-    return true;
-  }
-
-  private void showLocalFile(Path absoluteFilename, ImageView targetImageView) {
-    Image currentImage = targetImageView.getImage();
-    if (currentImage != null) {
-      currentImage.cancel();
-    }
-
-    Image image = new Image("file:///" + absoluteFilename, true);
-    image.progressProperty().addListener((observable, oldValue, newValue) -> log.trace("Progress: " + newValue.doubleValue() * 100 + "%"));
-    image.exceptionProperty().addListener((observable, oldValue, newValue) -> log.error(newValue.getMessage()));
-    targetImageView.setImage(image);
-  }
-
-  private void showRemoteFile(SyncFile syncFile, ImageView targetImageView) {
-    Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
-    if (completeFilePath.toFile().exists()) {
-      showLocalFile(completeFilePath, targetImageView);
-      return;
-    }
-    CopyCommand rcloneCopyService = new CopyCommand(syncFile);
-    rcloneCopyService.setCommandSucceededEvent(() -> {
-
-      if (rcloneCopyService == model.getLatestCopyCommand()) {
-        showLocalFile(completeFilePath, targetImageView);
-      }
-    });
-    serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), rcloneCopyService);
-    model.setLatestCopyCommand(rcloneCopyService);
   }
 
   /**
@@ -292,17 +206,6 @@ public class DiffController implements Initializable {
       diffButton.setText("Diff");
     });
     checkService.start();
-  }
-
-  private Path getTempDirectoryLazy() {
-    if (tempDirectory == null) {
-      try {
-        tempDirectory = Files.createTempDirectory("rclone-diff");
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    return tempDirectory;
   }
 
   /**

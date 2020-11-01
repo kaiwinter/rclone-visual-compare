@@ -1,5 +1,10 @@
 package com.github.kaiwinter.rclonediff.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
@@ -8,19 +13,25 @@ import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
 import com.github.kaiwinter.rclonediff.model.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Methods gets called from the view in order to manipulate the ViewModel.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class DiffService {
 
   private final RcloneCommandlineServiceFactory serviceFactory;
+
+  private Path tempDirectory;
 
   /**
    * Deletes the selected file on the source side.
@@ -150,6 +161,109 @@ public class DiffService {
       model.getContentDifferent().remove(syncFile);
     });
     serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), copyCommand);
+  }
+
+  /**
+   * Called to show an image which is selected on the source side.
+   *
+   * @param syncFile
+   * @param imageViewImage
+   * @param model
+   */
+  public void showImageFromSourcePath(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
+    imageViewImage.set(null);
+    if (syncFile == null) {
+      return;
+    }
+    if (!isImage(syncFile)) {
+      return;
+    }
+
+    String path = syncFile.getSourcePath();
+
+    if (isLocalPath(path)) {
+      Path completeFilePath = Path.of(syncFile.getSourcePath()).resolve(syncFile.getFile());
+      showLocalFile(completeFilePath, imageViewImage);
+    } else {
+      showRemoteFile(new SyncFile(syncFile.getSourcePath(), getTempDirectoryLazy().toString(), syncFile.getFile()), imageViewImage, model);
+    }
+  }
+
+  public void showImageFromTargetPath(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
+    imageViewImage.set(null);
+    if (syncFile == null) {
+      return;
+    }
+    if (!isImage(syncFile)) {
+      return;
+    }
+
+    String path = syncFile.getTargetPath();
+
+    if (isLocalPath(path)) {
+      Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
+      showLocalFile(completeFilePath, imageViewImage);
+    } else {
+      showRemoteFile(new SyncFile(syncFile.getTargetPath(), getTempDirectoryLazy().toString(), syncFile.getFile()), imageViewImage, model);
+    }
+  }
+
+  private void showLocalFile(Path absoluteFilename, ObjectProperty<Image> imageViewImage) {
+    if (imageViewImage.get() != null) {
+      imageViewImage.get().cancel();
+    }
+
+    Image image = new Image("file:///" + absoluteFilename, true);
+    image.progressProperty().addListener((observable, oldValue, newValue) -> log.trace("Progress: " + newValue.doubleValue() * 100 + "%"));
+    image.exceptionProperty().addListener((observable, oldValue, newValue) -> log.error(newValue.getMessage()));
+    imageViewImage.set(image);
+  }
+
+  private void showRemoteFile(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
+    model.setLatestCopyCommand(null);
+    Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
+    if (completeFilePath.toFile().exists()) {
+      showLocalFile(completeFilePath, imageViewImage);
+      return;
+    }
+    CopyCommand rcloneCopyService = new CopyCommand(syncFile);
+    rcloneCopyService.setCommandSucceededEvent(() -> {
+
+      if (rcloneCopyService == model.getLatestCopyCommand()) {
+        showLocalFile(completeFilePath, imageViewImage);
+      }
+    });
+    serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), rcloneCopyService);
+    model.setLatestCopyCommand(rcloneCopyService);
+  }
+
+  private boolean isImage(SyncFile syncFile) {
+    String fileExtension = syncFile.getFile().toLowerCase();
+    return fileExtension.endsWith(".jpg") //
+      || fileExtension.endsWith(".jpeg") //
+      || fileExtension.endsWith(".png") //
+      || fileExtension.endsWith(".gif") //
+      || fileExtension.endsWith(".bmp");
+  }
+
+  private Path getTempDirectoryLazy() {
+    if (tempDirectory == null) {
+      try {
+        tempDirectory = Files.createTempDirectory("rclone-diff");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return tempDirectory;
+  }
+
+  private boolean isLocalPath(String path) {
+    try {
+      Paths.get(path);
+    } catch (InvalidPathException | NullPointerException ex) {
+      return false;
+    }
+    return true;
   }
 
 }

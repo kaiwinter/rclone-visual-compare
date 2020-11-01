@@ -10,6 +10,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
+import javafx.scene.image.Image;
 import lombok.Data;
 
 /**
@@ -41,6 +42,9 @@ public class DiffModel {
   private final SimpleObjectProperty<SyncFile> selectedSourceFile = new SimpleObjectProperty<>();
   private final SimpleObjectProperty<SyncFile> selectedDiffFile = new SimpleObjectProperty<>();
   private final SimpleObjectProperty<SyncFile> selectedTargetFile = new SimpleObjectProperty<>();
+
+  private final ObjectProperty<Image> sourceImage = new SimpleObjectProperty<>();
+  private final ObjectProperty<Image> targetImage = new SimpleObjectProperty<>();
 
   public SimpleObjectProperty<SyncFile> selectedSourceFileProperty() {
     return this.selectedSourceFile;
@@ -78,5 +82,33 @@ public class DiffModel {
     this.selectedTargetFileProperty().set(selectedTargetFile);
   }
 
+
+  public ObjectProperty<Image> targetImageProperty() {
+    return this.targetImage;
+  }
+
+
+  public Image getTargetImage() {
+    return this.targetImageProperty().get();
+  }
+
+
+  public void setTargetImage(final Image targetImage) {
+    this.targetImageProperty().set(targetImage);
+  }
+
+  public ObjectProperty<Image> sourceImageProperty() {
+    return this.sourceImage;
+  }
+
+
+  public Image getSourceImage() {
+    return this.sourceImageProperty().get();
+  }
+
+
+  public void setSourceImage(final Image sourceImage) {
+    this.sourceImageProperty().set(sourceImage);
+  }
 
 }
