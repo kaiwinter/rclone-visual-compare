@@ -167,8 +167,11 @@ public class DiffService {
    * Called to show an image which is selected on the source side.
    *
    * @param syncFile
+   *          the {@link SyncFile} which should be shown
    * @param imageViewImage
+   *          the Property which gets filled with the image
    * @param model
+   *          the {@link DiffModel}
    */
   public void showImageFromSourcePath(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
     imageViewImage.set(null);
@@ -182,13 +185,23 @@ public class DiffService {
     String path = syncFile.getSourcePath();
 
     if (isLocalPath(path)) {
-      Path completeFilePath = Path.of(syncFile.getSourcePath()).resolve(syncFile.getFile());
+      Path completeFilePath = Path.of(path).resolve(syncFile.getFile());
       showLocalFile(completeFilePath, imageViewImage);
     } else {
-      showRemoteFile(new SyncFile(syncFile.getSourcePath(), getTempDirectoryLazy().toString(), syncFile.getFile()), imageViewImage, model);
+      showRemoteFile(new SyncFile(path, getTempDirectoryLazy().toString(), syncFile.getFile()), imageViewImage, model);
     }
   }
 
+  /**
+   * Called to show an image which is selected on the target side.
+   *
+   * @param syncFile
+   *          the {@link SyncFile} which should be shown
+   * @param imageViewImage
+   *          the Property which gets filled with the image
+   * @param model
+   *          the {@link DiffModel}
+   */
   public void showImageFromTargetPath(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
     imageViewImage.set(null);
     if (syncFile == null) {
@@ -201,10 +214,10 @@ public class DiffService {
     String path = syncFile.getTargetPath();
 
     if (isLocalPath(path)) {
-      Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
+      Path completeFilePath = Path.of(path).resolve(syncFile.getFile());
       showLocalFile(completeFilePath, imageViewImage);
     } else {
-      showRemoteFile(new SyncFile(syncFile.getTargetPath(), getTempDirectoryLazy().toString(), syncFile.getFile()), imageViewImage, model);
+      showRemoteFile(new SyncFile(path, getTempDirectoryLazy().toString(), syncFile.getFile()), imageViewImage, model);
     }
   }
 

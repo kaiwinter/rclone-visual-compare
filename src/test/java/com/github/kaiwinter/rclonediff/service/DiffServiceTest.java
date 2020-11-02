@@ -1,8 +1,13 @@
 package com.github.kaiwinter.rclonediff.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
+import java.io.File;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.github.kaiwinter.rclonediff.command.AbstractCommand;
@@ -10,10 +15,27 @@ import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
 import com.github.kaiwinter.rclonediff.model.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
+import javafx.application.Platform;
+import javafx.scene.image.Image;
+
 /**
  * Tests for {@link DiffService}.
  */
 class DiffServiceTest {
+
+  /**
+   * Necessary to test the construction of an {@link Image} object.
+   */
+  @BeforeAll
+  public static void initToolkit() {
+    try {
+      Platform.startup(() -> {
+        // Initialize Toolkit
+      });
+    } catch (IllegalStateException e) {
+      // initialized by previous test
+    }
+  }
 
   @Test
   void deleteSourceFile() {
@@ -124,6 +146,34 @@ class DiffServiceTest {
 
     assertEquals(0, model.getContentDifferent().size());
     assertEquals("copy \"target/file\" \"source/\"", serviceFactory.lastCommand.getCommandline());
+  }
+
+  @Test
+  void showImageFromSourcePath_local() {
+    AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
+
+    DiffModel model = new DiffModel();
+    String file = "image.png";
+    String pathToFile = new File(DiffServiceTest.class.getResource(file).getFile()).getParentFile().getAbsolutePath();
+    SyncFile syncFile = new SyncFile(pathToFile, "target", file);
+    new DiffService(serviceFactory).showImageFromSourcePath(syncFile, model.sourceImageProperty(), model);
+
+    assertNotNull(model.getSourceImage());
+    assertNull(model.getTargetImage());
+  }
+
+  @Test
+  void showImageFromTargetPath_local() {
+    AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
+
+    DiffModel model = new DiffModel();
+    String file = "image.png";
+    String pathToFile = new File(DiffServiceTest.class.getResource(file).getFile()).getParentFile().getAbsolutePath();
+    SyncFile syncFile = new SyncFile("source", pathToFile, file);
+    new DiffService(serviceFactory).showImageFromTargetPath(syncFile, model.targetImageProperty(), model);
+
+    assertNull(model.getSourceImage());
+    assertNotNull(model.getTargetImage());
   }
 
   /**
