@@ -5,8 +5,6 @@ import com.github.kaiwinter.rclonediff.core.DiffController;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -18,8 +16,6 @@ import lombok.Data;
  */
 @Data
 public class DiffModel {
-  private StringProperty rcloneBinaryPath = new SimpleStringProperty("rclone");
-
   private ObjectProperty<SyncEndpoint> source = new SimpleObjectProperty<>();
   private ObjectProperty<SyncEndpoint> target = new SimpleObjectProperty<>();
 

@@ -1,5 +1,7 @@
 package com.github.kaiwinter.rclonediff.command;
 
+import com.github.kaiwinter.rclonediff.core.PreferencesStore;
+
 import javafx.concurrent.Service;
 import lombok.RequiredArgsConstructor;
 
@@ -14,15 +16,14 @@ public class RcloneCommandlineServiceFactory {
   /**
    * Creates a runnable {@link Service} for a command.
    *
-   * @param rcloneBinaryPath
-   *          the path to the rclone executable
-   *
    * @param command
    *          the command
    * @return a {@link RcloneCommandlineService}
    */
-  public RcloneCommandlineService createService(String rcloneBinaryPath, AbstractCommand command) {
-    RcloneCommandlineService service = new RcloneCommandlineService(runtime, rcloneBinaryPath, command);
+  public RcloneCommandlineService createService(AbstractCommand command) {
+    String loadRcloneBinaryPath = PreferencesStore.loadRcloneBinaryPath();
+
+    RcloneCommandlineService service = new RcloneCommandlineService(runtime, loadRcloneBinaryPath, command);
     return service;
   }
 
@@ -30,13 +31,10 @@ public class RcloneCommandlineServiceFactory {
    * Convenience method which creates a service (see {@link #createService(AbstractCommand)}) and
    * starts it afterwards.
    *
-   * @param rcloneBinaryPath
-   *          the path to the rclone executable
-   *
    * @param command
    *          the command
    */
-  public void createServiceAndStart(String rcloneBinaryPath, AbstractCommand command) {
-    createService(rcloneBinaryPath, command).start();
+  public void createServiceAndStart(AbstractCommand command) {
+    createService(command).start();
   }
 }

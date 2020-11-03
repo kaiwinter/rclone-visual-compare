@@ -170,7 +170,6 @@ public class DiffController implements Initializable {
 
     PreferencesStore.loadSourceEndpoint().ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
     PreferencesStore.loadTargetEndpoint().ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
-    PreferencesStore.loadRcloneBinaryPath().ifPresent(rcloneBinaryPath -> model.getRcloneBinaryPath().setValue(rcloneBinaryPath));
   }
 
   /**
@@ -190,7 +189,7 @@ public class DiffController implements Initializable {
     model.getTargetOnly().clear();
 
     CheckCommand checkCommand = new CheckCommand(model);
-    RcloneCommandlineService checkService = serviceFactory.createService(model.getRcloneBinaryPath().getValue(), checkCommand);
+    RcloneCommandlineService checkService = serviceFactory.createService(checkCommand);
     model.setRunningCheckCommand(checkService);
 
     sourcePath.disableProperty().bind(checkService.runningProperty());
@@ -335,7 +334,8 @@ public class DiffController implements Initializable {
    */
   @FXML
   public void openPreferences() {
-    TextInputDialog dialog = new TextInputDialog(model.getRcloneBinaryPath().getValue());
+    String rcloneBinaryPath = PreferencesStore.loadRcloneBinaryPath();
+    TextInputDialog dialog = new TextInputDialog(rcloneBinaryPath);
     dialog.setTitle("rclone binary path");
     dialog.setHeaderText("rclone binary path");
     dialog.setContentText("rclone binary path:");
@@ -346,9 +346,8 @@ public class DiffController implements Initializable {
     okButton.disableProperty().bind(isValid);
 
     Optional<String> result = dialog.showAndWait();
-    result.ifPresent(rcloneBinaryPath -> {
-      model.getRcloneBinaryPath().setValue(rcloneBinaryPath);
-      PreferencesStore.saveRcloneBinaryPath(rcloneBinaryPath);
+    result.ifPresent(rclone -> {
+      PreferencesStore.saveRcloneBinaryPath(rclone);
     });
   }
 }

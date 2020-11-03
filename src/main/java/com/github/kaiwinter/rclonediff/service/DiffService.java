@@ -52,7 +52,7 @@ public class DiffService {
         model.getSourceOnly().remove(syncFile);
       });
 
-      serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), deleteCommand);
+      serviceFactory.createServiceAndStart(deleteCommand);
     }
   }
 
@@ -75,7 +75,7 @@ public class DiffService {
         model.getTargetOnly().remove(syncFile);
       });
 
-      serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), deleteCommand);
+      serviceFactory.createServiceAndStart(deleteCommand);
     }
   }
 
@@ -113,7 +113,7 @@ public class DiffService {
     copyCommand.setCommandSucceededEvent(() -> {
       model.getSourceOnly().remove(syncFile);
     });
-    serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), copyCommand);
+    serviceFactory.createServiceAndStart(copyCommand);
   }
 
   /**
@@ -129,7 +129,7 @@ public class DiffService {
     copyCommand.setCommandSucceededEvent(() -> {
       model.getTargetOnly().remove(syncFile);
     });
-    serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), copyCommand);
+    serviceFactory.createServiceAndStart(copyCommand);
   }
 
   /**
@@ -144,7 +144,7 @@ public class DiffService {
     copyCommand.setCommandSucceededEvent(() -> {
       model.getContentDifferent().remove(syncFile);
     });
-    serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), copyCommand);
+    serviceFactory.createServiceAndStart(copyCommand);
   }
 
   /**
@@ -160,7 +160,7 @@ public class DiffService {
     copyCommand.setCommandSucceededEvent(() -> {
       model.getContentDifferent().remove(syncFile);
     });
-    serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), copyCommand);
+    serviceFactory.createServiceAndStart(copyCommand);
   }
 
   /**
@@ -246,7 +246,7 @@ public class DiffService {
         showLocalFile(completeFilePath, imageViewImage);
       }
     });
-    serviceFactory.createServiceAndStart(model.getRcloneBinaryPath().getValue(), rcloneCopyService);
+    serviceFactory.createServiceAndStart(rcloneCopyService);
     model.setLatestCopyCommand(rcloneCopyService);
   }
 

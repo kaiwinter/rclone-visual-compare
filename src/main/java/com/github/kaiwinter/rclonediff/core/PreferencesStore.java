@@ -73,11 +73,13 @@ public class PreferencesStore {
   }
 
   /**
-   * @return the path to the rclone binary
+   * Loads the path to the rclone binary. If it is not set, "rclone" is returned as default.
+   *
+   * @return the path to the rclone binary, or "rclone" if not set.
    */
-  public static Optional<String> loadRcloneBinaryPath() {
+  public static String loadRcloneBinaryPath() {
     Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
-    return Optional.ofNullable(pref.get(RCLONE_BINARY_PATH, null));
+    return pref.get(RCLONE_BINARY_PATH, "rclone");
   }
 
   /**

@@ -190,7 +190,7 @@ class DiffServiceTest {
     }
 
     @Override
-    public void createServiceAndStart(String rcloneBinaryPath, AbstractCommand command) {
+    public void createServiceAndStart(AbstractCommand command) {
       this.lastCommand = command;
       command.getCommandSucceededEvent().run();
     }
@@ -208,6 +208,6 @@ class DiffServiceTest {
     }
 
     @Override
-    public void createServiceAndStart(String rcloneBinaryPath, AbstractCommand command) {}
+    public void createServiceAndStart(AbstractCommand command) {}
   }
 }
