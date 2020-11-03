@@ -3,5 +3,5 @@ language: java
 jdk:
   - openjdk11
 
-after_success:
+script:
   - mvn clean cobertura:cobertura coveralls:report
