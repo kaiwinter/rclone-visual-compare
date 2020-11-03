@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import org.apache.commons.io.FileUtils;
+
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
@@ -269,6 +271,20 @@ public class DiffService {
     }
     return tempDirectory;
   }
+
+  /**
+   * Deletes the temporary directory.
+   */
+  public void deleteTempDirectory() {
+    if (tempDirectory != null) {
+      try {
+        FileUtils.deleteDirectory(tempDirectory.toFile());
+      } catch (IOException e) {
+        log.error("Couldn't delete temp directory '{}'", tempDirectory, e);
+      }
+    }
+  }
+
 
   private boolean isLocalPath(String path) {
     try {

@@ -1,12 +1,8 @@
 package com.github.kaiwinter.rclonediff.core;
 
-import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
-import org.apache.commons.io.FileUtils;
 
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineService;
@@ -36,12 +32,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * The controller class of the view RcloneDiff.
  */
-@Slf4j
 public class DiffController implements Initializable {
 
   @FXML
@@ -103,8 +97,6 @@ public class DiffController implements Initializable {
 
   @FXML
   private ProgressIndicator progressIndicator;
-
-  private Path tempDirectory;
 
   private DiffModel model = new DiffModel();
 
@@ -211,13 +203,7 @@ public class DiffController implements Initializable {
    * Deletes the temporary directory.
    */
   public void deleteTempDirectory() {
-    if (tempDirectory != null) {
-      try {
-        FileUtils.deleteDirectory(tempDirectory.toFile());
-      } catch (IOException e) {
-        log.error("Couldn't delete temp directory '{}'", tempDirectory, e);
-      }
-    }
+    diffService.deleteTempDirectory();
   }
 
   /**
