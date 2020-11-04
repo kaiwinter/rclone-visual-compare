@@ -3,5 +3,8 @@ language: java
 jdk:
   - openjdk11
 
+before_install:
+  - sudo apt-get install -y openjfx libopenjfx-java
+
 after_success:
   - mvn clean test jacoco:report coveralls:report
