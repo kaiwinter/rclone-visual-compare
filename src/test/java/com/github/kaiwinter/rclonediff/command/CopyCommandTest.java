@@ -1,5 +1,6 @@
 package com.github.kaiwinter.rclonediff.command;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -23,5 +24,11 @@ class CopyCommandTest {
 
     CopyCommand copyCommand = new CopyCommand(syncFile);
     assertEquals("copy \"Dropbox:/backup/file.jpg\" \"c:/systemp/\"", copyCommand.getCommandline());
+  }
+
+  @Test
+  void expectedReturnCode() {
+    int[] actualReturnCodes = new CopyCommand(null).getExpectedReturnCodes();
+    assertArrayEquals(new int[] {0}, actualReturnCodes);
   }
 }

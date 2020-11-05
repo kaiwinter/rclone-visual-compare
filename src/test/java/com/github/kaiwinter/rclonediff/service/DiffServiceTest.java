@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -180,16 +181,43 @@ class DiffServiceTest {
 
   @Test
   void showImageFromSourcePath_remote() {
-    AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
+    DiffService diffService = new DiffService(new AlwaysSuccessfulServiceFactory(mock(Runtime.class)));
+    Path tempDirectory = diffService.getTempDirectoryLazy();
+    try {
+      DiffModel model = new DiffModel();
+      SyncFile syncFile =
+        new SyncFile(new SyncEndpoint(Type.REMOTE, "Remotename:/"), new SyncEndpoint(Type.LOCAL, tempDirectory.toString()), "image.png");
+      diffService.showImageFromSourcePath(syncFile, model.sourceImageProperty(), model);
 
-    DiffModel model = new DiffModel();
-    String file = "image.png";
-    String pathToFile = new File(DiffServiceTest.class.getResource(file).getFile()).getParentFile().getAbsolutePath();
-    SyncFile syncFile = new SyncFile(new SyncEndpoint(Type.LOCAL, pathToFile), new SyncEndpoint(Type.LOCAL, "target"), file);
-    new DiffService(serviceFactory).showImageFromSourcePath(syncFile, model.sourceImageProperty(), model);
+      assertNotNull(model.getSourceImage());
+      assertNull(model.getTargetImage());
 
-    assertNotNull(model.getSourceImage());
-    assertNull(model.getTargetImage());
+      String expectedCommandLine = "copy \"Remotename:/image.png\" \"" + tempDirectory.toString() + "/\"";
+      String actualCommandLine = model.getLatestCopyCommand().getCommandline();
+      assertEquals(expectedCommandLine, actualCommandLine);
+    } finally {
+      diffService.deleteTempDirectory();
+    }
+  }
+
+  @Test
+  void showImageFromTargetPath_remote() {
+    DiffService diffService = new DiffService(new AlwaysSuccessfulServiceFactory(mock(Runtime.class)));
+    Path tempDirectory = diffService.getTempDirectoryLazy();
+    try {
+      DiffModel model = new DiffModel();
+      SyncFile syncFile = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.REMOTE, "Remotename:/"), "image.png");
+      diffService.showImageFromTargetPath(syncFile, model.targetImageProperty(), model);
+
+      assertNull(model.getSourceImage());
+      assertNotNull(model.getTargetImage());
+
+      String expectedCommandLine = "copy \"Remotename:/image.png\" \"" + tempDirectory.toString() + "/\"";
+      String actualCommandLine = model.getLatestCopyCommand().getCommandline();
+      assertEquals(expectedCommandLine, actualCommandLine);
+    } finally {
+      diffService.deleteTempDirectory();
+    }
   }
 
   /**

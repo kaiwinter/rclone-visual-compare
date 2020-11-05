@@ -1,5 +1,6 @@
 package com.github.kaiwinter.rclonediff.command;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -134,5 +135,15 @@ class CheckCommandTest {
     assertEquals("20200108_184311.jpg", syncFile.getFile());
     assertEquals("c:/temp/", syncFile.getSourceEndpoint().getPath());
     assertEquals("Dropbox:/backup/", syncFile.getTargetEndpoint().getPath());
+  }
+
+  @Test
+  void expectedReturnCode() {
+    DiffModel model = new DiffModel();
+    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
+    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+
+    int[] actualReturnCodes = new CheckCommand(model).getExpectedReturnCodes();
+    assertArrayEquals(new int[] {0, 1}, actualReturnCodes);
   }
 }

@@ -244,6 +244,7 @@ public class DiffService {
       return;
     }
     CopyCommand rcloneCopyService = new CopyCommand(syncFile);
+    model.setLatestCopyCommand(rcloneCopyService);
     rcloneCopyService.setCommandSucceededEvent(() -> {
 
       if (rcloneCopyService == model.getLatestCopyCommand()) {
@@ -251,7 +252,6 @@ public class DiffService {
       }
     });
     serviceFactory.createServiceAndStart(rcloneCopyService);
-    model.setLatestCopyCommand(rcloneCopyService);
   }
 
   private boolean isImage(SyncFile syncFile) {
@@ -263,7 +263,7 @@ public class DiffService {
       || fileExtension.endsWith(".bmp");
   }
 
-  private Path getTempDirectoryLazy() {
+  Path getTempDirectoryLazy() {
     if (tempDirectory == null) {
       try {
         tempDirectory = Files.createTempDirectory("rclone-diff");
