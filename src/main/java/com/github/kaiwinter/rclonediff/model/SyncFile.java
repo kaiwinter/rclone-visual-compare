@@ -9,39 +9,17 @@ import lombok.Data;
 public class SyncFile {
 
   /**
-   * the source path as selected in the UI.
+   * the source endpoint as selected in the UI.
    */
-  private final String sourcePath;
+  private final SyncEndpoint sourceEndpoint;
 
   /**
-   * the target path as selected in the UI.
+   * the target Endpoint as selected in the UI.
    */
-  private final String targetPath;
+  private final SyncEndpoint targetEndpoint;
 
   /**
    * the file name, may contain path fragment
    */
   private final String file;
-
-  /**
-   * Constructs a new {@link SyncFile} with a normalized path (ending with an "/").
-   *
-   * @param sourcePath
-   *          the source path
-   * @param targetPath
-   *          the target path
-   * @param file
-   *          the file
-   */
-  public SyncFile(String sourcePath, String targetPath, String file) {
-    if (!sourcePath.endsWith("/")) {
-      sourcePath = sourcePath + "/";
-    }
-    if (!targetPath.endsWith("/")) {
-      targetPath = targetPath + "/";
-    }
-    this.sourcePath = sourcePath;
-    this.targetPath = targetPath;
-    this.file = file;
-  }
 }

@@ -22,8 +22,8 @@ public class CopyCommand extends AbstractCommand {
   @Override
   public String getCommandline() {
     String file = syncFile.getFile();
-    String fromPath = syncFile.getSourcePath();
-    String toPath = syncFile.getTargetPath();
+    String fromPath = syncFile.getSourceEndpoint().getPath();
+    String toPath = syncFile.getTargetEndpoint().getPath();
     String targetDirectory = toPath + file;
     targetDirectory = targetDirectory.substring(0, targetDirectory.lastIndexOf("/") + 1);
     return "copy " + wrapInQuotes(fromPath + file) + " " + wrapInQuotes(targetDirectory);

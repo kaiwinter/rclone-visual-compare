@@ -22,6 +22,22 @@ public class SyncEndpoint {
   private final String path;
 
   /**
+   * Constructs a new {@link SyncEndpoint} with a normalized path (ending with an "/").
+   *
+   * @param type
+   *          the {@link Type} of the endpoint
+   * @param path
+   *          the path
+   */
+  public SyncEndpoint(Type type, String path) {
+    if (!path.endsWith("/")) {
+      path = path + "/";
+    }
+    this.type = type;
+    this.path = path;
+  }
+
+  /**
    * @return a UI representation of this {@link SyncEndpoint}
    */
   public String toUiString() {

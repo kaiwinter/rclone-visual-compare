@@ -54,7 +54,7 @@ class CheckCommandTest {
     model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
 
     CheckCommand checkCommand = new CheckCommand(model);
-    assertEquals("check \"c:/temp/\" \"Dropbox:/backup\"", checkCommand.getCommandline());
+    assertEquals("check \"c:/temp/\" \"Dropbox:/backup/\"", checkCommand.getCommandline());
   }
 
   /**
@@ -79,8 +79,8 @@ class CheckCommandTest {
 
     SyncFile syncFile = notInLocal.get(0);
     assertEquals("20200501_081347.mp4", syncFile.getFile());
-    assertEquals("c:/temp/", syncFile.getSourcePath());
-    assertEquals("Dropbox:/backup/", syncFile.getTargetPath());
+    assertEquals("c:/temp/", syncFile.getSourceEndpoint().getPath());
+    assertEquals("Dropbox:/backup/", syncFile.getTargetEndpoint().getPath());
   }
 
   /**
@@ -88,11 +88,11 @@ class CheckCommandTest {
    */
   @Test
   void not_in_remote() {
-    String rcloneOutput = "2020/05/26 15:17:05 ERROR : 20200201_090433.jpg: File not in Encrypted drive 'Dropbox:/backup'";
+    String rcloneOutput = "2020/05/26 15:17:05 ERROR : 20200201_090433.jpg: File not in Encrypted drive 'Dropbox:/backup/'";
 
     DiffModel model = new DiffModel();
     model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup/"));
 
     CheckCommand checkCommand = new CheckCommand(model);
     checkCommand.handleRcloneOutput(rcloneOutput);
@@ -105,8 +105,8 @@ class CheckCommandTest {
 
     SyncFile syncFile = notInRemote.get(0);
     assertEquals("20200201_090433.jpg", syncFile.getFile());
-    assertEquals("c:/temp/", syncFile.getSourcePath());
-    assertEquals("Dropbox:/backup/", syncFile.getTargetPath());
+    assertEquals("c:/temp/", syncFile.getSourceEndpoint().getPath());
+    assertEquals("Dropbox:/backup/", syncFile.getTargetEndpoint().getPath());
   }
 
   /**
@@ -132,7 +132,7 @@ class CheckCommandTest {
 
     SyncFile syncFile = sizeDiffer.get(0);
     assertEquals("20200108_184311.jpg", syncFile.getFile());
-    assertEquals("c:/temp/", syncFile.getSourcePath());
-    assertEquals("Dropbox:/backup/", syncFile.getTargetPath());
+    assertEquals("c:/temp/", syncFile.getSourceEndpoint().getPath());
+    assertEquals("Dropbox:/backup/", syncFile.getTargetEndpoint().getPath());
   }
 }

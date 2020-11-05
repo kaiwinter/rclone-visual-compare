@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
+import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 /**
@@ -16,7 +18,8 @@ class CopyCommandTest {
    */
   @Test
   void valid_command() {
-    SyncFile syncFile = new SyncFile("Dropbox:/backup", "c:/systemp", "file.jpg");
+    SyncFile syncFile =
+      new SyncFile(new SyncEndpoint(Type.REMOTE, "Dropbox:/backup"), new SyncEndpoint(Type.LOCAL, "c:/systemp"), "file.jpg");
 
     CopyCommand copyCommand = new CopyCommand(syncFile);
     assertEquals("copy \"Dropbox:/backup/file.jpg\" \"c:/systemp/\"", copyCommand.getCommandline());

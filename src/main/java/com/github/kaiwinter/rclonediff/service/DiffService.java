@@ -2,9 +2,7 @@ package com.github.kaiwinter.rclonediff.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
@@ -13,6 +11,8 @@ import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
 import com.github.kaiwinter.rclonediff.model.DiffModel;
+import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
+import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.beans.property.ObjectProperty;
@@ -49,7 +49,7 @@ public class DiffService {
     }
 
     if (delete) {
-      DeleteCommand deleteCommand = new DeleteCommand(syncFile.getSourcePath() + syncFile.getFile());
+      DeleteCommand deleteCommand = new DeleteCommand(syncFile.getSourceEndpoint() + syncFile.getFile());
       deleteCommand.setCommandSucceededEvent(() -> {
         model.getSourceOnly().remove(syncFile);
       });
@@ -72,7 +72,7 @@ public class DiffService {
     }
 
     if (delete) {
-      DeleteCommand deleteCommand = new DeleteCommand(syncFile.getTargetPath() + syncFile.getFile());
+      DeleteCommand deleteCommand = new DeleteCommand(syncFile.getTargetEndpoint() + syncFile.getFile());
       deleteCommand.setCommandSucceededEvent(() -> {
         model.getTargetOnly().remove(syncFile);
       });
@@ -126,7 +126,7 @@ public class DiffService {
    */
   public void copyToSource(DiffModel model) {
     SyncFile syncFile = model.getSelectedTargetFile();
-    SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
+    SyncFile syncFileInverse = new SyncFile(syncFile.getTargetEndpoint(), syncFile.getSourceEndpoint(), syncFile.getFile());
     CopyCommand copyCommand = new CopyCommand(syncFileInverse);
     copyCommand.setCommandSucceededEvent(() -> {
       model.getTargetOnly().remove(syncFile);
@@ -157,7 +157,7 @@ public class DiffService {
    */
   public void copyToSourceFromDiff(DiffModel model) {
     SyncFile syncFile = model.getSelectedDiffFile();
-    SyncFile syncFileInverse = new SyncFile(syncFile.getTargetPath(), syncFile.getSourcePath(), syncFile.getFile());
+    SyncFile syncFileInverse = new SyncFile(syncFile.getTargetEndpoint(), syncFile.getSourceEndpoint(), syncFile.getFile());
     CopyCommand copyCommand = new CopyCommand(syncFileInverse);
     copyCommand.setCommandSucceededEvent(() -> {
       model.getContentDifferent().remove(syncFile);
@@ -184,13 +184,14 @@ public class DiffService {
       return;
     }
 
-    String path = syncFile.getSourcePath();
+    SyncEndpoint syncEndpoint = syncFile.getSourceEndpoint();
 
-    if (isLocalPath(path)) {
-      Path completeFilePath = Path.of(path).resolve(syncFile.getFile());
+    if (syncEndpoint.getType() == Type.LOCAL) {
+      Path completeFilePath = Path.of(syncEndpoint.getPath()).resolve(syncFile.getFile());
       showLocalFile(completeFilePath, imageViewImage);
     } else {
-      showRemoteFile(new SyncFile(path, getTempDirectoryLazy().toString(), syncFile.getFile()), imageViewImage, model);
+      showRemoteFile(new SyncFile(syncEndpoint, new SyncEndpoint(Type.LOCAL, getTempDirectoryLazy().toString()), syncFile.getFile()),
+        imageViewImage, model);
     }
   }
 
@@ -213,13 +214,14 @@ public class DiffService {
       return;
     }
 
-    String path = syncFile.getTargetPath();
+    SyncEndpoint syncEndpoint = syncFile.getTargetEndpoint();
 
-    if (isLocalPath(path)) {
-      Path completeFilePath = Path.of(path).resolve(syncFile.getFile());
+    if (syncEndpoint.getType() == Type.LOCAL) {
+      Path completeFilePath = Path.of(syncEndpoint.getPath()).resolve(syncFile.getFile());
       showLocalFile(completeFilePath, imageViewImage);
     } else {
-      showRemoteFile(new SyncFile(path, getTempDirectoryLazy().toString(), syncFile.getFile()), imageViewImage, model);
+      showRemoteFile(new SyncFile(syncEndpoint, new SyncEndpoint(Type.LOCAL, getTempDirectoryLazy().toString()), syncFile.getFile()),
+        imageViewImage, model);
     }
   }
 
@@ -236,7 +238,7 @@ public class DiffService {
 
   private void showRemoteFile(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
     model.setLatestCopyCommand(null);
-    Path completeFilePath = Path.of(syncFile.getTargetPath()).resolve(syncFile.getFile());
+    Path completeFilePath = Path.of(syncFile.getTargetEndpoint().getPath()).resolve(syncFile.getFile());
     if (completeFilePath.toFile().exists()) {
       showLocalFile(completeFilePath, imageViewImage);
       return;
@@ -284,15 +286,4 @@ public class DiffService {
       }
     }
   }
-
-
-  private boolean isLocalPath(String path) {
-    try {
-      Paths.get(path);
-    } catch (InvalidPathException | NullPointerException ex) {
-      return false;
-    }
-    return true;
-  }
-
 }

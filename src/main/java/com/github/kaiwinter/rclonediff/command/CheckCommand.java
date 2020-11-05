@@ -81,19 +81,19 @@ public class CheckCommand extends AbstractCommand {
 
     if ((matcher = SIZES_DIFFER.matcher(line)).matches()) {
       final Matcher m = matcher;
-      Platform.runLater(() -> model.getContentDifferent().add(new SyncFile(source.getPath(), target.getPath(), m.group(1))));
+      Platform.runLater(() -> model.getContentDifferent().add(new SyncFile(source, target, m.group(1))));
       log.info(line + " (differences)");
 
     } else if ((matcher = sourcePattern.matcher(line)).matches()) {
 
       final Matcher m = matcher;
-      Platform.runLater(() -> model.getTargetOnly().add(new SyncFile(source.getPath(), target.getPath(), m.group(1))));
+      Platform.runLater(() -> model.getTargetOnly().add(new SyncFile(source, target, m.group(1))));
       log.info(line + " (missing in source)");
 
     } else if ((matcher = targetPattern.matcher(line)).matches()) {
 
       final Matcher m = matcher;
-      Platform.runLater(() -> model.getSourceOnly().add(new SyncFile(source.getPath(), target.getPath(), m.group(1))));
+      Platform.runLater(() -> model.getSourceOnly().add(new SyncFile(source, target, m.group(1))));
       log.info(line + " (missing in target)");
 
     } else {
