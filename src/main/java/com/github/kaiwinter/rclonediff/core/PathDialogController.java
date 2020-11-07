@@ -1,6 +1,8 @@
 package com.github.kaiwinter.rclonediff.core;
 
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
@@ -9,6 +11,7 @@ import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -41,6 +44,9 @@ public class PathDialogController {
   @FXML
   private Label slashesInfo;
 
+  @FXML
+  private Label invalidPathInfo;
+
   private Dialog<SyncEndpoint> dialog;
 
   /**
@@ -71,6 +77,17 @@ public class PathDialogController {
 
       Node okButton = dialogPane.lookupButton(ButtonType.OK);
       okButton.disableProperty().bind(isPathValid.or(isTypeValid).or(correctSlashes));
+      okButton.addEventFilter(ActionEvent.ACTION, event -> {
+        // if path is a local one check if it is accessible
+        if (type.getSelectedToggle() == localToggle) {
+          try {
+            Paths.get(path.getText().trim());
+          } catch (InvalidPathException e) {
+            invalidPathInfo.setVisible(true);
+            event.consume();
+          }
+        }
+      });
 
       dialog.setResultConverter(buttonType -> {
 
