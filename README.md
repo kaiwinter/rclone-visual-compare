@@ -18,14 +18,14 @@ The current focus of this project is to compare directories which contain images
 
 ## TODO
 - FEATURES
-  - Export of the result
   - Show metadata for files (size etc.)
   - Bind counter in list titles to real number of items (they change on delete/copy operations)
+  - Have multi-selection for file operations
 
 - TECHNICAL
   - Sorter/formatter for lists (SyncFile-Object)
   - Use lsjon instead of check (re-implement matching)?
-  - Tree instead of ListView
-  - Have multi-selection for file operations
+  - Tree instead of ListView?
   - Don't start second download of a remote image if a download of this image is in progress already
   - "Copy to xyz": if source is remote and file was copied to local for preview already, copy the temp file instead of starting a new download
+  - Cancel running copy operations on application exit
