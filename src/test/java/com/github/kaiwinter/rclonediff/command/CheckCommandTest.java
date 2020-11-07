@@ -11,8 +11,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.github.kaiwinter.rclonediff.model.DiffModel;
-import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
+import com.github.kaiwinter.rclonediff.util.TestFactories.DiffModelFactory;
 
 import javafx.application.Platform;
 
@@ -50,9 +50,9 @@ class CheckCommandTest {
    */
   @Test
   void valid_command() {
-    DiffModel model = new DiffModel();
-    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    DiffModel model = new DiffModelFactory() //
+      .withLocalSourceEndpoint("c:/temp/") //
+      .withRemoteTargetEndpoint("Dropbox:/backup").create();
 
     CheckCommand checkCommand = new CheckCommand(model);
     assertEquals("check \"c:/temp/\" \"Dropbox:/backup/\"", checkCommand.getCommandline());
@@ -65,9 +65,9 @@ class CheckCommandTest {
   void not_in_local() {
     String rcloneOutput = "2020/05/26 15:17:06 ERROR : 20200501_081347.mp4: File not in Local file system at //?/c:/temp/";
 
-    DiffModel model = new DiffModel();
-    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    DiffModel model = new DiffModelFactory() //
+      .withLocalSourceEndpoint("c:/temp/") //
+      .withRemoteTargetEndpoint("Dropbox:/backup").create();
 
     CheckCommand checkCommand = new CheckCommand(model);
     checkCommand.handleRcloneOutput(rcloneOutput);
@@ -91,9 +91,9 @@ class CheckCommandTest {
   void not_in_remote() {
     String rcloneOutput = "2020/05/26 15:17:05 ERROR : 20200201_090433.jpg: File not in Encrypted drive 'Dropbox:/backup/'";
 
-    DiffModel model = new DiffModel();
-    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup/"));
+    DiffModel model = new DiffModelFactory() //
+      .withLocalSourceEndpoint("c:/temp/") //
+      .withRemoteTargetEndpoint("Dropbox:/backup").create();
 
     CheckCommand checkCommand = new CheckCommand(model);
     checkCommand.handleRcloneOutput(rcloneOutput);
@@ -117,9 +117,9 @@ class CheckCommandTest {
   void different() {
     String rcloneOutput = "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: Sizes differ";
 
-    DiffModel model = new DiffModel();
-    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    DiffModel model = new DiffModelFactory() //
+      .withLocalSourceEndpoint("c:/temp/") //
+      .withRemoteTargetEndpoint("Dropbox:/backup").create();
 
     CheckCommand checkCommand = new CheckCommand(model);
     checkCommand.handleRcloneOutput(rcloneOutput);
@@ -139,9 +139,9 @@ class CheckCommandTest {
 
   @Test
   void expectedReturnCode() {
-    DiffModel model = new DiffModel();
-    model.getSource().setValue(new SyncEndpoint(SyncEndpoint.Type.LOCAL, "c:/temp/"));
-    model.getTarget().setValue(new SyncEndpoint(SyncEndpoint.Type.REMOTE, "Dropbox:/backup"));
+    DiffModel model = new DiffModelFactory() //
+      .withLocalSourceEndpoint("c:/temp/") //
+      .withRemoteTargetEndpoint("Dropbox:/backup").create();
 
     int[] actualReturnCodes = new CheckCommand(model).getExpectedReturnCodes();
     assertArrayEquals(new int[] {0, 1}, actualReturnCodes);

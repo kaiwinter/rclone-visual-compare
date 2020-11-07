@@ -1,5 +1,7 @@
 package com.github.kaiwinter.rclonediff.service;
 
+import static com.github.kaiwinter.rclonediff.util.TestFactories.SyncEndpointFactory.createLocalEndpoint;
+import static com.github.kaiwinter.rclonediff.util.TestFactories.SyncEndpointFactory.createRemoteEndpoint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -14,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import com.github.kaiwinter.rclonediff.command.AbstractCommand;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
 import com.github.kaiwinter.rclonediff.model.DiffModel;
-import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
-import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.application.Platform;
@@ -46,7 +46,7 @@ class DiffServiceTest {
 
     DiffModel model = new DiffModel();
     model.setAlwaysDelete(true);
-    SyncFile synFileToCopy = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, "target"), "file");
+    SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
     model.setSelectedSourceFile(synFileToCopy);
     new DiffService(serviceFactory).deleteSourceFile(model);
@@ -60,7 +60,7 @@ class DiffServiceTest {
 
     DiffModel model = new DiffModel();
     model.setAlwaysDelete(true);
-    SyncFile synFileToCopy = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, "target"), "file");
+    SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
     model.setSelectedSourceFile(synFileToCopy);
     new DiffService(serviceFactory).deleteSourceFile(model);
@@ -74,7 +74,7 @@ class DiffServiceTest {
 
     DiffModel model = new DiffModel();
     model.setAlwaysDelete(true);
-    SyncFile synFileToCopy = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, "target"), "file");
+    SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getTargetOnly().add(synFileToCopy);
     model.setSelectedTargetFile(synFileToCopy);
     new DiffService(serviceFactory).deleteTargetFile(model);
@@ -87,7 +87,7 @@ class DiffServiceTest {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
     DiffModel model = new DiffModel();
-    SyncFile synFileToCopy = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, "target"), "file");
+    SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
     model.setSelectedSourceFile(synFileToCopy);
     new DiffService(serviceFactory).copyToTarget(model);
@@ -101,7 +101,7 @@ class DiffServiceTest {
     AlwaysFailingServiceFactory serviceFactory = new AlwaysFailingServiceFactory(mock(Runtime.class));
 
     DiffModel model = new DiffModel();
-    SyncFile synFileToCopy = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, "target"), "file");
+    SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
     model.setSelectedSourceFile(synFileToCopy);
     new DiffService(serviceFactory).copyToTarget(model);
@@ -114,7 +114,7 @@ class DiffServiceTest {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
     DiffModel model = new DiffModel();
-    SyncFile synFileToCopy = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, "target"), "file");
+    SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getTargetOnly().add(synFileToCopy);
     model.setSelectedTargetFile(synFileToCopy);
     new DiffService(serviceFactory).copyToSource(model);
@@ -128,7 +128,7 @@ class DiffServiceTest {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
     DiffModel model = new DiffModel();
-    SyncFile synFileToCopy = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, "target"), "file");
+    SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getContentDifferent().add(synFileToCopy);
     model.setSelectedDiffFile(synFileToCopy);
     new DiffService(serviceFactory).copyToTargetFromDiff(model);
@@ -142,7 +142,7 @@ class DiffServiceTest {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
     DiffModel model = new DiffModel();
-    SyncFile synFileToCopy = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, "target"), "file");
+    SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getContentDifferent().add(synFileToCopy);
     model.setSelectedDiffFile(synFileToCopy);
     new DiffService(serviceFactory).copyToSourceFromDiff(model);
@@ -158,7 +158,7 @@ class DiffServiceTest {
     DiffModel model = new DiffModel();
     String file = "image.png";
     String pathToFile = new File(DiffServiceTest.class.getResource(file).getFile()).getParentFile().getAbsolutePath();
-    SyncFile syncFile = new SyncFile(new SyncEndpoint(Type.LOCAL, pathToFile), new SyncEndpoint(Type.LOCAL, "target"), file);
+    SyncFile syncFile = new SyncFile(createLocalEndpoint(pathToFile), createLocalEndpoint("target"), file);
     new DiffService(serviceFactory).showImageFromSourcePath(syncFile, model.sourceImageProperty(), model);
 
     assertNotNull(model.getSourceImage());
@@ -172,7 +172,7 @@ class DiffServiceTest {
     DiffModel model = new DiffModel();
     String file = "image.png";
     String pathToFile = new File(DiffServiceTest.class.getResource(file).getFile()).getParentFile().getAbsolutePath();
-    SyncFile syncFile = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.LOCAL, pathToFile), file);
+    SyncFile syncFile = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint(pathToFile), file);
     new DiffService(serviceFactory).showImageFromTargetPath(syncFile, model.targetImageProperty(), model);
 
     assertNull(model.getSourceImage());
@@ -185,8 +185,7 @@ class DiffServiceTest {
     Path tempDirectory = diffService.getTempDirectoryLazy();
     try {
       DiffModel model = new DiffModel();
-      SyncFile syncFile =
-        new SyncFile(new SyncEndpoint(Type.REMOTE, "Remotename:/"), new SyncEndpoint(Type.LOCAL, tempDirectory.toString()), "image.png");
+      SyncFile syncFile = new SyncFile(createRemoteEndpoint("Remotename:/"), createLocalEndpoint(tempDirectory.toString()), "image.png");
       diffService.showImageFromSourcePath(syncFile, model.sourceImageProperty(), model);
 
       assertNotNull(model.getSourceImage());
@@ -206,7 +205,7 @@ class DiffServiceTest {
     Path tempDirectory = diffService.getTempDirectoryLazy();
     try {
       DiffModel model = new DiffModel();
-      SyncFile syncFile = new SyncFile(new SyncEndpoint(Type.LOCAL, "source"), new SyncEndpoint(Type.REMOTE, "Remotename:/"), "image.png");
+      SyncFile syncFile = new SyncFile(createLocalEndpoint("source"), createRemoteEndpoint("Remotename:/"), "image.png");
       diffService.showImageFromTargetPath(syncFile, model.targetImageProperty(), model);
 
       assertNull(model.getSourceImage());
