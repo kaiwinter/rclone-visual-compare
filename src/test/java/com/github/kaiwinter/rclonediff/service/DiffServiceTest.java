@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import com.github.kaiwinter.rclonediff.model.DiffModel;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.scene.image.Image;
 
 /**
@@ -48,7 +50,7 @@ class DiffServiceTest {
     model.setAlwaysDelete(true);
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
-    model.setSelectedSourceFile(synFileToCopy);
+    model.setSelectedSourceFiles(FXCollections.observableList(List.of(synFileToCopy)));
     new DiffService(serviceFactory).deleteSourceFile(model);
 
     assertEquals(0, model.getSourceOnly().size());
@@ -62,7 +64,7 @@ class DiffServiceTest {
     model.setAlwaysDelete(true);
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
-    model.setSelectedSourceFile(synFileToCopy);
+    model.setSelectedSourceFiles(FXCollections.observableList(List.of(synFileToCopy)));
     new DiffService(serviceFactory).deleteSourceFile(model);
 
     assertEquals(1, model.getSourceOnly().size());
@@ -76,7 +78,7 @@ class DiffServiceTest {
     model.setAlwaysDelete(true);
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getTargetOnly().add(synFileToCopy);
-    model.setSelectedTargetFile(synFileToCopy);
+    model.setSelectedTargetFiles(FXCollections.observableList(List.of(synFileToCopy)));
     new DiffService(serviceFactory).deleteTargetFile(model);
 
     assertEquals(0, model.getTargetOnly().size());
@@ -89,7 +91,7 @@ class DiffServiceTest {
     DiffModel model = new DiffModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
-    model.setSelectedSourceFile(synFileToCopy);
+    model.setSelectedSourceFiles(FXCollections.observableList(List.of(synFileToCopy)));
     new DiffService(serviceFactory).copyToTarget(model);
 
     assertEquals(0, model.getSourceOnly().size());
@@ -103,7 +105,7 @@ class DiffServiceTest {
     DiffModel model = new DiffModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
-    model.setSelectedSourceFile(synFileToCopy);
+    model.setSelectedSourceFiles(FXCollections.observableList(List.of(synFileToCopy)));
     new DiffService(serviceFactory).copyToTarget(model);
 
     assertEquals(1, model.getSourceOnly().size());
@@ -116,7 +118,7 @@ class DiffServiceTest {
     DiffModel model = new DiffModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getTargetOnly().add(synFileToCopy);
-    model.setSelectedTargetFile(synFileToCopy);
+    model.setSelectedTargetFiles(FXCollections.observableList(List.of(synFileToCopy)));
     new DiffService(serviceFactory).copyToSource(model);
 
     assertEquals(0, model.getTargetOnly().size());
@@ -130,7 +132,7 @@ class DiffServiceTest {
     DiffModel model = new DiffModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getContentDifferent().add(synFileToCopy);
-    model.setSelectedDiffFile(synFileToCopy);
+    model.setSelectedDiffFiles(FXCollections.observableList(List.of(synFileToCopy)));
     new DiffService(serviceFactory).copyToTargetFromDiff(model);
 
     assertEquals(0, model.getContentDifferent().size());
@@ -144,7 +146,7 @@ class DiffServiceTest {
     DiffModel model = new DiffModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getContentDifferent().add(synFileToCopy);
-    model.setSelectedDiffFile(synFileToCopy);
+    model.setSelectedDiffFiles(FXCollections.observableList(List.of(synFileToCopy)));
     new DiffService(serviceFactory).copyToSourceFromDiff(model);
 
     assertEquals(0, model.getContentDifferent().size());

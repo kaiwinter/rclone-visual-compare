@@ -16,6 +16,7 @@ import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -42,19 +43,21 @@ public class DiffService {
    *          the {@link DiffModel}
    */
   public void deleteSourceFile(DiffModel model) {
-    SyncFile syncFile = model.getSelectedSourceFile();
-    boolean delete = model.isAlwaysDelete();
-    if (!delete) {
-      delete = askForDeleteConfirmation(model, syncFile.getFile());
-    }
+    ObservableList<SyncFile> syncFiles = model.getSelectedSourceFiles();
+    for (SyncFile syncFile : syncFiles) {
+      boolean delete = model.isAlwaysDelete();
+      if (!delete) {
+        delete = askForDeleteConfirmation(model, syncFile.getFile());
+      }
 
-    if (delete) {
-      DeleteCommand deleteCommand = new DeleteCommand(syncFile.getSourceEndpoint() + syncFile.getFile());
-      deleteCommand.setCommandSucceededEvent(() -> {
-        model.getSourceOnly().remove(syncFile);
-      });
+      if (delete) {
+        DeleteCommand deleteCommand = new DeleteCommand(syncFile.getSourceEndpoint() + syncFile.getFile());
+        deleteCommand.setCommandSucceededEvent(() -> {
+          model.getSourceOnly().remove(syncFile);
+        });
 
-      serviceFactory.createServiceAndStart(deleteCommand);
+        serviceFactory.createServiceAndStart(deleteCommand);
+      }
     }
   }
 
@@ -65,19 +68,22 @@ public class DiffService {
    *          the {@link DiffModel}
    */
   public void deleteTargetFile(DiffModel model) {
-    SyncFile syncFile = model.getSelectedTargetFile();
-    boolean delete = model.isAlwaysDelete();
-    if (!delete) {
-      delete = askForDeleteConfirmation(model, syncFile.getFile());
-    }
+    ObservableList<SyncFile> syncFiles = model.getSelectedTargetFiles();
+    for (SyncFile syncFile : syncFiles) {
+      boolean delete = model.isAlwaysDelete();
+      if (!delete) {
+        delete = askForDeleteConfirmation(model, syncFile.getFile());
+      }
 
-    if (delete) {
-      DeleteCommand deleteCommand = new DeleteCommand(syncFile.getTargetEndpoint() + syncFile.getFile());
-      deleteCommand.setCommandSucceededEvent(() -> {
-        model.getTargetOnly().remove(syncFile);
-      });
+      if (delete) {
+        DeleteCommand deleteCommand = new DeleteCommand(syncFile.getTargetEndpoint() + syncFile.getFile());
+        deleteCommand.setCommandSucceededEvent(() -> {
+          model.getTargetOnly().remove(syncFile);
+        });
 
-      serviceFactory.createServiceAndStart(deleteCommand);
+        serviceFactory.createServiceAndStart(deleteCommand);
+      }
+
     }
   }
 
@@ -110,12 +116,14 @@ public class DiffService {
    *          the {@link DiffModel}
    */
   public void copyToTarget(DiffModel model) {
-    SyncFile syncFile = model.getSelectedSourceFile();
-    CopyCommand copyCommand = new CopyCommand(syncFile);
-    copyCommand.setCommandSucceededEvent(() -> {
-      model.getSourceOnly().remove(syncFile);
-    });
-    serviceFactory.createServiceAndStart(copyCommand);
+    ObservableList<SyncFile> syncFiles = model.getSelectedSourceFiles();
+    for (SyncFile syncFile : syncFiles) {
+      CopyCommand copyCommand = new CopyCommand(syncFile);
+      copyCommand.setCommandSucceededEvent(() -> {
+        model.getSourceOnly().remove(syncFile);
+      });
+      serviceFactory.createServiceAndStart(copyCommand);
+    }
   }
 
   /**
@@ -125,13 +133,15 @@ public class DiffService {
    *          the {@link DiffModel}
    */
   public void copyToSource(DiffModel model) {
-    SyncFile syncFile = model.getSelectedTargetFile();
-    SyncFile syncFileInverse = new SyncFile(syncFile.getTargetEndpoint(), syncFile.getSourceEndpoint(), syncFile.getFile());
-    CopyCommand copyCommand = new CopyCommand(syncFileInverse);
-    copyCommand.setCommandSucceededEvent(() -> {
-      model.getTargetOnly().remove(syncFile);
-    });
-    serviceFactory.createServiceAndStart(copyCommand);
+    ObservableList<SyncFile> syncFiles = model.getSelectedTargetFiles();
+    for (SyncFile syncFile : syncFiles) {
+      SyncFile syncFileInverse = new SyncFile(syncFile.getTargetEndpoint(), syncFile.getSourceEndpoint(), syncFile.getFile());
+      CopyCommand copyCommand = new CopyCommand(syncFileInverse);
+      copyCommand.setCommandSucceededEvent(() -> {
+        model.getTargetOnly().remove(syncFile);
+      });
+      serviceFactory.createServiceAndStart(copyCommand);
+    }
   }
 
   /**
@@ -141,12 +151,14 @@ public class DiffService {
    *          the {@link DiffModel}
    */
   public void copyToTargetFromDiff(DiffModel model) {
-    SyncFile syncFile = model.getSelectedDiffFile();
-    CopyCommand copyCommand = new CopyCommand(syncFile);
-    copyCommand.setCommandSucceededEvent(() -> {
-      model.getContentDifferent().remove(syncFile);
-    });
-    serviceFactory.createServiceAndStart(copyCommand);
+    ObservableList<SyncFile> syncFiles = model.getSelectedDiffFiles();
+    for (SyncFile syncFile : syncFiles) {
+      CopyCommand copyCommand = new CopyCommand(syncFile);
+      copyCommand.setCommandSucceededEvent(() -> {
+        model.getContentDifferent().remove(syncFile);
+      });
+      serviceFactory.createServiceAndStart(copyCommand);
+    }
   }
 
   /**
@@ -156,13 +168,15 @@ public class DiffService {
    *          the {@link DiffModel}
    */
   public void copyToSourceFromDiff(DiffModel model) {
-    SyncFile syncFile = model.getSelectedDiffFile();
-    SyncFile syncFileInverse = new SyncFile(syncFile.getTargetEndpoint(), syncFile.getSourceEndpoint(), syncFile.getFile());
-    CopyCommand copyCommand = new CopyCommand(syncFileInverse);
-    copyCommand.setCommandSucceededEvent(() -> {
-      model.getContentDifferent().remove(syncFile);
-    });
-    serviceFactory.createServiceAndStart(copyCommand);
+    ObservableList<SyncFile> syncFiles = model.getSelectedDiffFiles();
+    for (SyncFile syncFile : syncFiles) {
+      SyncFile syncFileInverse = new SyncFile(syncFile.getTargetEndpoint(), syncFile.getSourceEndpoint(), syncFile.getFile());
+      CopyCommand copyCommand = new CopyCommand(syncFileInverse);
+      copyCommand.setCommandSucceededEvent(() -> {
+        model.getContentDifferent().remove(syncFile);
+      });
+      serviceFactory.createServiceAndStart(copyCommand);
+    }
   }
 
   /**

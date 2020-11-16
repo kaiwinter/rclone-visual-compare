@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.TextFieldListCell;
@@ -105,6 +106,14 @@ public class DiffController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    sourceOnly.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    diffs.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    targetOnly.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    model.setSelectedSourceFiles(sourceOnly.getSelectionModel().getSelectedItems());
+    model.setSelectedDiffFiles(diffs.getSelectionModel().getSelectedItems());
+    model.setSelectedTargetFiles(targetOnly.getSelectionModel().getSelectedItems());
+
     sourceOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
     diffs.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
     targetOnly.setCellFactory(TextFieldListCell.forListView(new SyncFileStringConverter()));
@@ -148,10 +157,6 @@ public class DiffController implements Initializable {
     };
     Bindings.bindBidirectional(sourcePath.textProperty(), model.getSource(), converter);
     Bindings.bindBidirectional(targetPath.textProperty(), model.getTarget(), converter);
-
-    model.selectedSourceFileProperty().bind(sourceOnly.getSelectionModel().selectedItemProperty());
-    model.selectedTargetFileProperty().bind(targetOnly.getSelectionModel().selectedItemProperty());
-    model.selectedDiffFileProperty().bind(diffs.getSelectionModel().selectedItemProperty());
 
     Bindings.bindBidirectional(sourceOnlyImage.imageProperty(), model.sourceImageProperty());
     Bindings.bindBidirectional(targetOnlyImage.imageProperty(), model.targetImageProperty());

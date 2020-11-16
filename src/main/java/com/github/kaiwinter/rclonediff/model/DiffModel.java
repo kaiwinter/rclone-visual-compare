@@ -35,48 +35,13 @@ public class DiffModel {
   /** If false, the user gets asked before any delete operation. */
   private boolean alwaysDelete = false;
 
-  private final SimpleObjectProperty<SyncFile> selectedSourceFile = new SimpleObjectProperty<>();
-  private final SimpleObjectProperty<SyncFile> selectedDiffFile = new SimpleObjectProperty<>();
-  private final SimpleObjectProperty<SyncFile> selectedTargetFile = new SimpleObjectProperty<>();
+  private ObservableList<SyncFile> selectedSourceFiles;
+  private ObservableList<SyncFile> selectedDiffFiles;
+  private ObservableList<SyncFile> selectedTargetFiles;
 
   private final ObjectProperty<Image> sourceImage = new SimpleObjectProperty<>();
   private final ObjectProperty<Image> targetImage = new SimpleObjectProperty<>();
 
-  public SimpleObjectProperty<SyncFile> selectedSourceFileProperty() {
-    return this.selectedSourceFile;
-  }
-
-  public SyncFile getSelectedSourceFile() {
-    return this.selectedSourceFileProperty().get();
-  }
-
-  public void setSelectedSourceFile(final SyncFile selectedSourceFile) {
-    this.selectedSourceFileProperty().set(selectedSourceFile);
-  }
-
-  public SimpleObjectProperty<SyncFile> selectedDiffFileProperty() {
-    return this.selectedDiffFile;
-  }
-
-  public SyncFile getSelectedDiffFile() {
-    return this.selectedDiffFileProperty().get();
-  }
-
-  public void setSelectedDiffFile(final SyncFile selectedDiffFile) {
-    this.selectedDiffFileProperty().set(selectedDiffFile);
-  }
-
-  public SimpleObjectProperty<SyncFile> selectedTargetFileProperty() {
-    return this.selectedTargetFile;
-  }
-
-  public SyncFile getSelectedTargetFile() {
-    return this.selectedTargetFileProperty().get();
-  }
-
-  public void setSelectedTargetFile(final SyncFile selectedTargetFile) {
-    this.selectedTargetFileProperty().set(selectedTargetFile);
-  }
 
 
   public ObjectProperty<Image> targetImageProperty() {

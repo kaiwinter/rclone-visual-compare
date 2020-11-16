@@ -20,7 +20,6 @@ The current focus of this project is to compare directories which contain images
 - FEATURES
   - Show metadata for files (size etc.)
   - Bind counter in list titles to real number of items (they change on delete/copy operations)
-  - Have multi-selection for file operations
 
 - TECHNICAL
   - Sorter/formatter for lists (SyncFile-Object)
