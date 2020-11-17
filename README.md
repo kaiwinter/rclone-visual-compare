@@ -4,6 +4,8 @@ This is done by using the `clone check` command with afterwards parsing of its o
 The UI provides simple functions like deleting one file on one of both sides or showing a preview of images.
 The current focus of this project is to compare directories which contain images.
 
+[![Build Status](https://travis-ci.org/kaiwinter/rclone-visual-compare.svg?branch=master)](https://travis-ci.org/kaiwinter/rclone-visual-compare)
+
 ## Features
 - Compare two directories (local or remote)
 - Show a preview image of a selected file (local/remote)
