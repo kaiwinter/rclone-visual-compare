@@ -1,4 +1,4 @@
-package com.github.kaiwinter.rclonediff.ui;
+package com.github.kaiwinter.rclonediff.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

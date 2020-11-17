@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
 import com.github.kaiwinter.rclonediff.command.DeleteCommand;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
-import com.github.kaiwinter.rclonediff.model.DiffModel;
+import com.github.kaiwinter.rclonediff.model.RcloneCompareViewModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class DiffService {
+public class RcloneCompareService {
 
   private final RcloneCommandlineServiceFactory serviceFactory;
 
@@ -40,9 +40,9 @@ public class DiffService {
    * Deletes the selected file on the source side.
    *
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public void deleteSourceFile(DiffModel model) {
+  public void deleteSourceFile(RcloneCompareViewModel model) {
     ObservableList<SyncFile> syncFiles = model.getSelectedSourceFiles();
     for (SyncFile syncFile : syncFiles) {
       boolean delete = model.isAlwaysDelete();
@@ -65,9 +65,9 @@ public class DiffService {
    * Deletes the selected file on the target side.
    *
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public void deleteTargetFile(DiffModel model) {
+  public void deleteTargetFile(RcloneCompareViewModel model) {
     ObservableList<SyncFile> syncFiles = model.getSelectedTargetFiles();
     for (SyncFile syncFile : syncFiles) {
       boolean delete = model.isAlwaysDelete();
@@ -87,7 +87,7 @@ public class DiffService {
     }
   }
 
-  private boolean askForDeleteConfirmation(DiffModel model, String filename) {
+  private boolean askForDeleteConfirmation(RcloneCompareViewModel model, String filename) {
     Alert alert = new Alert(AlertType.CONFIRMATION);
     alert.setTitle("Delete confirmation");
     alert.setHeaderText("Do you really want to delete '" + filename + "'");
@@ -113,9 +113,9 @@ public class DiffService {
    * Called to copy a file selected on the source side to the target side.
    *
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public void copyToTarget(DiffModel model) {
+  public void copyToTarget(RcloneCompareViewModel model) {
     ObservableList<SyncFile> syncFiles = model.getSelectedSourceFiles();
     for (SyncFile syncFile : syncFiles) {
       CopyCommand copyCommand = new CopyCommand(syncFile);
@@ -130,9 +130,9 @@ public class DiffService {
    * Called to copy a file selected on the target side to the source side.
    *
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public void copyToSource(DiffModel model) {
+  public void copyToSource(RcloneCompareViewModel model) {
     ObservableList<SyncFile> syncFiles = model.getSelectedTargetFiles();
     for (SyncFile syncFile : syncFiles) {
       SyncFile syncFileInverse = new SyncFile(syncFile.getTargetEndpoint(), syncFile.getSourceEndpoint(), syncFile.getFile());
@@ -148,9 +148,9 @@ public class DiffService {
    * Called to copy a file selected in the "different content" list to the target side.
    *
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public void copyToTargetFromDiff(DiffModel model) {
+  public void copyToTargetFromDiff(RcloneCompareViewModel model) {
     ObservableList<SyncFile> syncFiles = model.getSelectedDiffFiles();
     for (SyncFile syncFile : syncFiles) {
       CopyCommand copyCommand = new CopyCommand(syncFile);
@@ -165,9 +165,9 @@ public class DiffService {
    * Called to copy a file selected in the "different content" list to the source side.
    *
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public void copyToSourceFromDiff(DiffModel model) {
+  public void copyToSourceFromDiff(RcloneCompareViewModel model) {
     ObservableList<SyncFile> syncFiles = model.getSelectedDiffFiles();
     for (SyncFile syncFile : syncFiles) {
       SyncFile syncFileInverse = new SyncFile(syncFile.getTargetEndpoint(), syncFile.getSourceEndpoint(), syncFile.getFile());
@@ -187,9 +187,9 @@ public class DiffService {
    * @param imageViewImage
    *          the Property which gets filled with the image
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public void showImageFromSourcePath(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
+  public void showImageFromSourcePath(SyncFile syncFile, ObjectProperty<Image> imageViewImage, RcloneCompareViewModel model) {
     imageViewImage.set(null);
     if (syncFile == null) {
       return;
@@ -217,9 +217,9 @@ public class DiffService {
    * @param imageViewImage
    *          the Property which gets filled with the image
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public void showImageFromTargetPath(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
+  public void showImageFromTargetPath(SyncFile syncFile, ObjectProperty<Image> imageViewImage, RcloneCompareViewModel model) {
     imageViewImage.set(null);
     if (syncFile == null) {
       return;
@@ -250,7 +250,7 @@ public class DiffService {
     imageViewImage.set(image);
   }
 
-  private void showRemoteFile(SyncFile syncFile, ObjectProperty<Image> imageViewImage, DiffModel model) {
+  private void showRemoteFile(SyncFile syncFile, ObjectProperty<Image> imageViewImage, RcloneCompareViewModel model) {
     model.setLatestCopyCommand(null);
     Path completeFilePath = Path.of(syncFile.getTargetEndpoint().getPath()).resolve(syncFile.getFile());
     if (completeFilePath.toFile().exists()) {

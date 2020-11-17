@@ -1,4 +1,4 @@
-package com.github.kaiwinter.rclonediff.core;
+package com.github.kaiwinter.rclonediff.view;
 
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
@@ -24,10 +24,10 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 
 /**
- * Controller of the path selection dialog. The Dialog is initialized and open by calling its
+ * View class of the path selection dialog. The Dialog is initialized and open by calling its
  * constructor.
  */
-public class PathDialogController {
+public class PathDialogView {
 
   @FXML
   private TextField path;
@@ -55,8 +55,8 @@ public class PathDialogController {
    * @param syncEndpoint
    *          the current {@link SyncEndpoint} to be shown in the dialog
    */
-  public PathDialogController(SyncEndpoint syncEndpoint) {
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/PathDialog.fxml"));
+  public PathDialogView(SyncEndpoint syncEndpoint) {
+    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/PathDialogView.fxml"));
     fxmlLoader.setController(this);
 
     try {

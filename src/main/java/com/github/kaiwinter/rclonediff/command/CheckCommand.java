@@ -5,7 +5,7 @@ import static com.github.kaiwinter.rclonediff.util.StringUtils.wrapInQuotes;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.kaiwinter.rclonediff.model.DiffModel;
+import com.github.kaiwinter.rclonediff.model.RcloneCompareViewModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
@@ -23,7 +23,7 @@ public class CheckCommand extends AbstractCommand {
   private static final String NOT_IN_LOCAL = ".*ERROR : (.*): File not in Local file system at \\/\\/\\?\\/{0}";
   private static final String NOT_IN_REMOTE = ".*ERROR : (.*): File not in .*'{0}'";
 
-  private final DiffModel model;
+  private final RcloneCompareViewModel model;
 
   private final Pattern sourcePattern;
   private final Pattern targetPattern;
@@ -32,9 +32,9 @@ public class CheckCommand extends AbstractCommand {
    * Constructs a new {@link CheckCommand} and initializes regular expressions to parse rclone output.
    *
    * @param model
-   *          the {@link DiffModel}
+   *          the {@link RcloneCompareViewModel}
    */
-  public CheckCommand(DiffModel model) {
+  public CheckCommand(RcloneCompareViewModel model) {
     this.model = model;
 
     SyncEndpoint source = model.getSource().getValue();

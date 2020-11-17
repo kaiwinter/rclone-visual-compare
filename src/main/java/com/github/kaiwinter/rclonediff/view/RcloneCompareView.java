@@ -1,4 +1,4 @@
-package com.github.kaiwinter.rclonediff.core;
+package com.github.kaiwinter.rclonediff.view;
 
 import java.net.URL;
 import java.util.Optional;
@@ -7,11 +7,12 @@ import java.util.ResourceBundle;
 import com.github.kaiwinter.rclonediff.command.CheckCommand;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineService;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
-import com.github.kaiwinter.rclonediff.model.DiffModel;
+import com.github.kaiwinter.rclonediff.model.RcloneCompareViewModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
-import com.github.kaiwinter.rclonediff.service.DiffService;
-import com.github.kaiwinter.rclonediff.ui.SyncFileStringConverter;
+import com.github.kaiwinter.rclonediff.service.PreferencesStoreService;
+import com.github.kaiwinter.rclonediff.service.RcloneCompareService;
+import com.github.kaiwinter.rclonediff.util.SyncFileStringConverter;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -35,9 +36,9 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 /**
- * The controller class of the view RcloneDiff.
+ * The view class of RcloneCompareView.
  */
-public class DiffController implements Initializable {
+public class RcloneCompareView implements Initializable {
 
   @FXML
   private TextField sourcePath;
@@ -99,10 +100,10 @@ public class DiffController implements Initializable {
   @FXML
   private ProgressIndicator progressIndicator;
 
-  private DiffModel model = new DiffModel();
+  private RcloneCompareViewModel model = new RcloneCompareViewModel();
 
   private RcloneCommandlineServiceFactory serviceFactory = new RcloneCommandlineServiceFactory(Runtime.getRuntime());
-  private DiffService diffService = new DiffService(serviceFactory);
+  private RcloneCompareService diffService = new RcloneCompareService(serviceFactory);
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -165,8 +166,8 @@ public class DiffController implements Initializable {
     diffs.setItems(model.getContentDifferent());
     targetOnly.setItems(model.getTargetOnly());
 
-    PreferencesStore.loadSourceEndpoint().ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
-    PreferencesStore.loadTargetEndpoint().ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
+    PreferencesStoreService.loadSourceEndpoint().ifPresent(syncEndpoint -> model.getSource().setValue(syncEndpoint));
+    PreferencesStoreService.loadTargetEndpoint().ifPresent(syncEndpoint -> model.getTarget().setValue(syncEndpoint));
   }
 
   /**
@@ -299,11 +300,11 @@ public class DiffController implements Initializable {
    */
   @FXML
   public void chooseSourcePath() {
-    PathDialogController pathDialogController = new PathDialogController(model.getSource().getValue());
+    PathDialogView pathDialogController = new PathDialogView(model.getSource().getValue());
     Optional<SyncEndpoint> result = pathDialogController.showAndWait();
     result.ifPresent(syncEndpoint -> {
       model.getSource().setValue(syncEndpoint);
-      PreferencesStore.saveSourceEndpoint(syncEndpoint);
+      PreferencesStoreService.saveSourceEndpoint(syncEndpoint);
     });
   }
 
@@ -312,11 +313,11 @@ public class DiffController implements Initializable {
    */
   @FXML
   public void chooseTargetPath() {
-    PathDialogController pathDialogController = new PathDialogController(model.getTarget().getValue());
+    PathDialogView pathDialogController = new PathDialogView(model.getTarget().getValue());
     Optional<SyncEndpoint> result = pathDialogController.showAndWait();
     result.ifPresent(syncEndpoint -> {
       model.getTarget().setValue(syncEndpoint);
-      PreferencesStore.saveTargetEndpoint(syncEndpoint);
+      PreferencesStoreService.saveTargetEndpoint(syncEndpoint);
     });
   }
 
@@ -325,7 +326,7 @@ public class DiffController implements Initializable {
    */
   @FXML
   public void openPreferences() {
-    String rcloneBinaryPath = PreferencesStore.loadRcloneBinaryPath();
+    String rcloneBinaryPath = PreferencesStoreService.loadRcloneBinaryPath();
     TextInputDialog dialog = new TextInputDialog(rcloneBinaryPath);
     dialog.setTitle("rclone binary path");
     dialog.setHeaderText("rclone binary path");
@@ -338,7 +339,7 @@ public class DiffController implements Initializable {
 
     Optional<String> result = dialog.showAndWait();
     result.ifPresent(rclone -> {
-      PreferencesStore.saveRcloneBinaryPath(rclone);
+      PreferencesStoreService.saveRcloneBinaryPath(rclone);
     });
   }
 }

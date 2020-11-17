@@ -2,7 +2,7 @@ package com.github.kaiwinter.rclonediff;
 
 import java.io.IOException;
 
-import com.github.kaiwinter.rclonediff.core.DiffController;
+import com.github.kaiwinter.rclonediff.view.RcloneCompareView;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 public class MainApplication extends Application {
 
-  private DiffController controller;
+  private RcloneCompareView view;
 
   public static void main(String[] args) {
     launch();
@@ -21,9 +21,9 @@ public class MainApplication extends Application {
   @Override
   public void start(Stage primaryStage) throws IOException {
     FXMLLoader loader = new FXMLLoader();
-    AnchorPane page = (AnchorPane) loader.load(getClass().getResourceAsStream("/RcloneDiff.fxml"));
+    AnchorPane page = (AnchorPane) loader.load(getClass().getResourceAsStream("/RcloneCompareView.fxml"));
     Scene scene = new Scene(page);
-    controller = loader.getController();
+    view = loader.getController();
 
     primaryStage.setScene(scene);
     primaryStage.show();
@@ -32,6 +32,6 @@ public class MainApplication extends Application {
 
   @Override
   public void stop() throws Exception {
-    controller.deleteTempDirectory();
+    view.deleteTempDirectory();
   }
 }

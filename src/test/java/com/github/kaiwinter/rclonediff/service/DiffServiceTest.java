@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import com.github.kaiwinter.rclonediff.command.AbstractCommand;
 import com.github.kaiwinter.rclonediff.command.RcloneCommandlineServiceFactory;
-import com.github.kaiwinter.rclonediff.model.DiffModel;
+import com.github.kaiwinter.rclonediff.model.RcloneCompareViewModel;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import javafx.application.Platform;
@@ -24,7 +24,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.image.Image;
 
 /**
- * Tests for {@link DiffService}.
+ * Tests for {@link RcloneCompareService}.
  */
 class DiffServiceTest {
 
@@ -46,12 +46,12 @@ class DiffServiceTest {
   void deleteSourceFile() {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     model.setAlwaysDelete(true);
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
     model.setSelectedSourceFiles(FXCollections.observableList(List.of(synFileToCopy)));
-    new DiffService(serviceFactory).deleteSourceFile(model);
+    new RcloneCompareService(serviceFactory).deleteSourceFile(model);
 
     assertEquals(0, model.getSourceOnly().size());
   }
@@ -60,12 +60,12 @@ class DiffServiceTest {
   void deleteSourceFile_fail() {
     AlwaysFailingServiceFactory serviceFactory = new AlwaysFailingServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     model.setAlwaysDelete(true);
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
     model.setSelectedSourceFiles(FXCollections.observableList(List.of(synFileToCopy)));
-    new DiffService(serviceFactory).deleteSourceFile(model);
+    new RcloneCompareService(serviceFactory).deleteSourceFile(model);
 
     assertEquals(1, model.getSourceOnly().size());
   }
@@ -74,12 +74,12 @@ class DiffServiceTest {
   void deleteTargetFile() {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     model.setAlwaysDelete(true);
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getTargetOnly().add(synFileToCopy);
     model.setSelectedTargetFiles(FXCollections.observableList(List.of(synFileToCopy)));
-    new DiffService(serviceFactory).deleteTargetFile(model);
+    new RcloneCompareService(serviceFactory).deleteTargetFile(model);
 
     assertEquals(0, model.getTargetOnly().size());
   }
@@ -88,11 +88,11 @@ class DiffServiceTest {
   void copyToTarget() {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
     model.setSelectedSourceFiles(FXCollections.observableList(List.of(synFileToCopy)));
-    new DiffService(serviceFactory).copyToTarget(model);
+    new RcloneCompareService(serviceFactory).copyToTarget(model);
 
     assertEquals(0, model.getSourceOnly().size());
     assertEquals("copy \"source/file\" \"target/\"", serviceFactory.lastCommand.getCommandline());
@@ -102,11 +102,11 @@ class DiffServiceTest {
   void copyToTarget_fail() {
     AlwaysFailingServiceFactory serviceFactory = new AlwaysFailingServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getSourceOnly().add(synFileToCopy);
     model.setSelectedSourceFiles(FXCollections.observableList(List.of(synFileToCopy)));
-    new DiffService(serviceFactory).copyToTarget(model);
+    new RcloneCompareService(serviceFactory).copyToTarget(model);
 
     assertEquals(1, model.getSourceOnly().size());
   }
@@ -115,11 +115,11 @@ class DiffServiceTest {
   void copyToSource() {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getTargetOnly().add(synFileToCopy);
     model.setSelectedTargetFiles(FXCollections.observableList(List.of(synFileToCopy)));
-    new DiffService(serviceFactory).copyToSource(model);
+    new RcloneCompareService(serviceFactory).copyToSource(model);
 
     assertEquals(0, model.getTargetOnly().size());
     assertEquals("copy \"target/file\" \"source/\"", serviceFactory.lastCommand.getCommandline());
@@ -129,11 +129,11 @@ class DiffServiceTest {
   void copyToTargetFromDiff() {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getContentDifferent().add(synFileToCopy);
     model.setSelectedDiffFiles(FXCollections.observableList(List.of(synFileToCopy)));
-    new DiffService(serviceFactory).copyToTargetFromDiff(model);
+    new RcloneCompareService(serviceFactory).copyToTargetFromDiff(model);
 
     assertEquals(0, model.getContentDifferent().size());
     assertEquals("copy \"source/file\" \"target/\"", serviceFactory.lastCommand.getCommandline());
@@ -143,11 +143,11 @@ class DiffServiceTest {
   void copyToSourceFromDiff() {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     SyncFile synFileToCopy = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint("target"), "file");
     model.getContentDifferent().add(synFileToCopy);
     model.setSelectedDiffFiles(FXCollections.observableList(List.of(synFileToCopy)));
-    new DiffService(serviceFactory).copyToSourceFromDiff(model);
+    new RcloneCompareService(serviceFactory).copyToSourceFromDiff(model);
 
     assertEquals(0, model.getContentDifferent().size());
     assertEquals("copy \"target/file\" \"source/\"", serviceFactory.lastCommand.getCommandline());
@@ -157,11 +157,11 @@ class DiffServiceTest {
   void showImageFromSourcePath_local() {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     String file = "image.png";
     String pathToFile = new File(DiffServiceTest.class.getResource(file).getFile()).getParentFile().getAbsolutePath();
     SyncFile syncFile = new SyncFile(createLocalEndpoint(pathToFile), createLocalEndpoint("target"), file);
-    new DiffService(serviceFactory).showImageFromSourcePath(syncFile, model.sourceImageProperty(), model);
+    new RcloneCompareService(serviceFactory).showImageFromSourcePath(syncFile, model.sourceImageProperty(), model);
 
     assertNotNull(model.getSourceImage());
     assertNull(model.getTargetImage());
@@ -171,11 +171,11 @@ class DiffServiceTest {
   void showImageFromTargetPath_local() {
     AlwaysSuccessfulServiceFactory serviceFactory = new AlwaysSuccessfulServiceFactory(mock(Runtime.class));
 
-    DiffModel model = new DiffModel();
+    RcloneCompareViewModel model = new RcloneCompareViewModel();
     String file = "image.png";
     String pathToFile = new File(DiffServiceTest.class.getResource(file).getFile()).getParentFile().getAbsolutePath();
     SyncFile syncFile = new SyncFile(createLocalEndpoint("source"), createLocalEndpoint(pathToFile), file);
-    new DiffService(serviceFactory).showImageFromTargetPath(syncFile, model.targetImageProperty(), model);
+    new RcloneCompareService(serviceFactory).showImageFromTargetPath(syncFile, model.targetImageProperty(), model);
 
     assertNull(model.getSourceImage());
     assertNotNull(model.getTargetImage());
@@ -183,10 +183,10 @@ class DiffServiceTest {
 
   @Test
   void showImageFromSourcePath_remote() {
-    DiffService diffService = new DiffService(new AlwaysSuccessfulServiceFactory(mock(Runtime.class)));
+    RcloneCompareService diffService = new RcloneCompareService(new AlwaysSuccessfulServiceFactory(mock(Runtime.class)));
     Path tempDirectory = diffService.getTempDirectoryLazy();
     try {
-      DiffModel model = new DiffModel();
+      RcloneCompareViewModel model = new RcloneCompareViewModel();
       SyncFile syncFile = new SyncFile(createRemoteEndpoint("Remotename:/"), createLocalEndpoint(tempDirectory.toString()), "image.png");
       diffService.showImageFromSourcePath(syncFile, model.sourceImageProperty(), model);
 
@@ -203,10 +203,10 @@ class DiffServiceTest {
 
   @Test
   void showImageFromTargetPath_remote() {
-    DiffService diffService = new DiffService(new AlwaysSuccessfulServiceFactory(mock(Runtime.class)));
+    RcloneCompareService diffService = new RcloneCompareService(new AlwaysSuccessfulServiceFactory(mock(Runtime.class)));
     Path tempDirectory = diffService.getTempDirectoryLazy();
     try {
-      DiffModel model = new DiffModel();
+      RcloneCompareViewModel model = new RcloneCompareViewModel();
       SyncFile syncFile = new SyncFile(createLocalEndpoint("source"), createRemoteEndpoint("Remotename:/"), "image.png");
       diffService.showImageFromTargetPath(syncFile, model.targetImageProperty(), model);
 

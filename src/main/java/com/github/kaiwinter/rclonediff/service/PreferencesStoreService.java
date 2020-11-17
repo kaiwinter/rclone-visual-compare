@@ -1,4 +1,4 @@
-package com.github.kaiwinter.rclonediff.core;
+package com.github.kaiwinter.rclonediff.service;
 
 import java.util.Optional;
 import java.util.prefs.Preferences;
@@ -10,7 +10,7 @@ import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 /**
  * The Application stores preferences. This class provides access to them.
  */
-public class PreferencesStore {
+public class PreferencesStoreService {
 
   private static final String SOURCE_PATH = "source.path";
   private static final String SOURCE_PATH_TYPE = "source.path.type";

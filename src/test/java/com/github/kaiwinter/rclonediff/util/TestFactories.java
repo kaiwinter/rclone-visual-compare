@@ -1,6 +1,6 @@
 package com.github.kaiwinter.rclonediff.util;
 
-import com.github.kaiwinter.rclonediff.model.DiffModel;
+import com.github.kaiwinter.rclonediff.model.RcloneCompareViewModel;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint;
 import com.github.kaiwinter.rclonediff.model.SyncEndpoint.Type;
 
@@ -30,8 +30,8 @@ public class TestFactories {
       return this;
     }
 
-    public DiffModel create() {
-      DiffModel diffModel = new DiffModel();
+    public RcloneCompareViewModel create() {
+      RcloneCompareViewModel diffModel = new RcloneCompareViewModel();
       diffModel.getSource().setValue(sourceEndpoint);
       diffModel.getTarget().setValue(targetEndpoint);
       return diffModel;

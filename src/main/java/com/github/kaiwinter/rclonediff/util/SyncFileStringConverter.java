@@ -1,4 +1,4 @@
-package com.github.kaiwinter.rclonediff.ui;
+package com.github.kaiwinter.rclonediff.util;
 
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 

@@ -1,7 +1,7 @@
 package com.github.kaiwinter.rclonediff.model;
 
 import com.github.kaiwinter.rclonediff.command.CopyCommand;
-import com.github.kaiwinter.rclonediff.core.DiffController;
+import com.github.kaiwinter.rclonediff.view.RcloneCompareView;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -12,10 +12,10 @@ import javafx.scene.image.Image;
 import lombok.Data;
 
 /**
- * ViewModel for the {@link DiffController}.
+ * ViewModel for the {@link RcloneCompareView}.
  */
 @Data
-public class DiffModel {
+public class RcloneCompareViewModel {
   private ObjectProperty<SyncEndpoint> source = new SimpleObjectProperty<>();
   private ObjectProperty<SyncEndpoint> target = new SimpleObjectProperty<>();
 

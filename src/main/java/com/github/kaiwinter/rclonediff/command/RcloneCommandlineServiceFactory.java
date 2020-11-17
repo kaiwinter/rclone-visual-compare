@@ -1,6 +1,6 @@
 package com.github.kaiwinter.rclonediff.command;
 
-import com.github.kaiwinter.rclonediff.core.PreferencesStore;
+import com.github.kaiwinter.rclonediff.service.PreferencesStoreService;
 
 import javafx.concurrent.Service;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class RcloneCommandlineServiceFactory {
    * @return a {@link RcloneCommandlineService}
    */
   public RcloneCommandlineService createService(AbstractCommand command) {
-    String loadRcloneBinaryPath = PreferencesStore.loadRcloneBinaryPath();
+    String loadRcloneBinaryPath = PreferencesStoreService.loadRcloneBinaryPath();
 
     RcloneCommandlineService service = new RcloneCommandlineService(runtime, loadRcloneBinaryPath, command);
     return service;

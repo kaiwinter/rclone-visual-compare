@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.github.kaiwinter.rclonediff.ui.AlertDialogBuilder;
+import com.github.kaiwinter.rclonediff.util.AlertDialogBuilder;
 
 import javafx.application.Platform;
 import javafx.concurrent.Service;
