@@ -51,7 +51,7 @@ public class RcloneCompareService {
       }
 
       if (delete) {
-        DeleteCommand deleteCommand = new DeleteCommand(syncFile.getSourceEndpoint() + syncFile.getFile());
+        DeleteCommand deleteCommand = new DeleteCommand(syncFile.getSourceEndpoint().getPath() + syncFile.getFile());
         deleteCommand.setCommandSucceededEvent(() -> {
           model.getSourceOnly().remove(syncFile);
         });
@@ -76,7 +76,7 @@ public class RcloneCompareService {
       }
 
       if (delete) {
-        DeleteCommand deleteCommand = new DeleteCommand(syncFile.getTargetEndpoint() + syncFile.getFile());
+        DeleteCommand deleteCommand = new DeleteCommand(syncFile.getTargetEndpoint().getPath() + syncFile.getFile());
         deleteCommand.setCommandSucceededEvent(() -> {
           model.getTargetOnly().remove(syncFile);
         });

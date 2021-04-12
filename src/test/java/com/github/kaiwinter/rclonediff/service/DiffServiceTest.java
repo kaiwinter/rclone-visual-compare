@@ -54,6 +54,7 @@ class DiffServiceTest {
     new RcloneCompareService(serviceFactory).deleteSourceFile(model);
 
     assertEquals(0, model.getSourceOnly().size());
+    assertEquals("delete \"source/file\"", serviceFactory.lastCommand.getCommandline());
   }
 
   @Test
@@ -82,6 +83,7 @@ class DiffServiceTest {
     new RcloneCompareService(serviceFactory).deleteTargetFile(model);
 
     assertEquals(0, model.getTargetOnly().size());
+    assertEquals("delete \"target/file\"", serviceFactory.lastCommand.getCommandline());
   }
 
   @Test
