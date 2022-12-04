@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CheckCommand extends AbstractCommand {
 
-  private static final Pattern SIZES_DIFFER = Pattern.compile(".*ERROR : (.*): Sizes differ");
+  private static final Pattern SIZES_DIFFER = Pattern.compile(".*ERROR : (.*): Sizes differ", Pattern.CASE_INSENSITIVE);
   private static final String NOT_IN_LOCAL = ".*ERROR : (.*): File not in Local file system at \\/\\/\\?\\/{0}";
   private static final String NOT_IN_REMOTE = ".*ERROR : (.*): File not in .*'{0}'";
 
@@ -41,17 +41,17 @@ public class CheckCommand extends AbstractCommand {
     SyncEndpoint target = model.getTarget().getValue();
 
     if (source.getType() == Type.LOCAL) {
-      sourcePattern = Pattern.compile(NOT_IN_LOCAL.replace("{0}", Pattern.quote(source.getPath())));
+      sourcePattern = Pattern.compile(NOT_IN_LOCAL.replace("{0}", Pattern.quote(source.getPath())), Pattern.CASE_INSENSITIVE);
     } else if (source.getType() == Type.REMOTE) {
-      sourcePattern = Pattern.compile(NOT_IN_REMOTE.replace("{0}", Pattern.quote(source.getPath())));
+      sourcePattern = Pattern.compile(NOT_IN_REMOTE.replace("{0}", Pattern.quote(source.getPath())), Pattern.CASE_INSENSITIVE);
     } else {
       throw new IllegalArgumentException("Unknown type '" + source.getType() + "'");
     }
 
     if (target.getType() == Type.LOCAL) {
-      targetPattern = Pattern.compile(NOT_IN_LOCAL.replace("{0}", Pattern.quote(target.getPath())));
+      targetPattern = Pattern.compile(NOT_IN_LOCAL.replace("{0}", Pattern.quote(target.getPath())), Pattern.CASE_INSENSITIVE);
     } else if (target.getType() == Type.REMOTE) {
-      targetPattern = Pattern.compile(NOT_IN_REMOTE.replace("{0}", Pattern.quote(target.getPath())));
+      targetPattern = Pattern.compile(NOT_IN_REMOTE.replace("{0}", Pattern.quote(target.getPath())), Pattern.CASE_INSENSITIVE);
     } else {
       throw new IllegalArgumentException("Unknown type '" + target.getType() + "'");
     }

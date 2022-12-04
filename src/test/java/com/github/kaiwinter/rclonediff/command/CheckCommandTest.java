@@ -9,6 +9,8 @@ import java.util.concurrent.Semaphore;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.github.kaiwinter.rclonediff.model.RcloneCompareViewModel;
 import com.github.kaiwinter.rclonediff.model.SyncFile;
@@ -61,10 +63,11 @@ class CheckCommandTest {
   /**
    * Tests if files which are not on local side are parsed correctly.
    */
-  @Test
-  void not_in_local() {
-    String rcloneOutput = "2020/05/26 15:17:06 ERROR : 20200501_081347.mp4: File not in Local file system at //?/c:/temp/";
-
+  @ParameterizedTest
+  @ValueSource(strings = { //
+      "2020/05/26 15:17:06 ERROR : 20200501_081347.mp4: File not in Local file system at //?/c:/temp/", //
+      "2020/05/26 15:17:06 ERROR : 20200501_081347.mp4: file not in Local file system at //?/c:/temp/"})
+  void not_in_local(String rcloneOutput) {
     RcloneCompareViewModel model = new DiffModelFactory() //
       .withLocalSourceEndpoint("c:/temp/") //
       .withRemoteTargetEndpoint("Dropbox:/backup").create();
@@ -87,10 +90,11 @@ class CheckCommandTest {
   /**
    * Tests if files which are not the remote side are parsed correctly.
    */
-  @Test
-  void not_in_remote() {
-    String rcloneOutput = "2020/05/26 15:17:05 ERROR : 20200201_090433.jpg: File not in Encrypted drive 'Dropbox:/backup/'";
-
+  @ParameterizedTest
+  @ValueSource(strings = { //
+      "2020/05/26 15:17:05 ERROR : 20200201_090433.jpg: File not in Encrypted drive 'Dropbox:/backup/'", //
+      "2020/05/26 15:17:05 ERROR : 20200201_090433.jpg: file not in Encrypted drive 'Dropbox:/backup/'"})
+  void not_in_remote(String rcloneOutput) {
     RcloneCompareViewModel model = new DiffModelFactory() //
       .withLocalSourceEndpoint("c:/temp/") //
       .withRemoteTargetEndpoint("Dropbox:/backup").create();
@@ -113,10 +117,11 @@ class CheckCommandTest {
   /**
    * Tests if files which are on the local and remote side but are different are parsed correctly.
    */
-  @Test
-  void different() {
-    String rcloneOutput = "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: Sizes differ";
-
+  @ParameterizedTest
+  @ValueSource(strings = { //
+      "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: Sizes differ", //
+      "2020/05/26 15:17:06 ERROR : 20200108_184311.jpg: sizes differ"})
+  void different(String rcloneOutput) {
     RcloneCompareViewModel model = new DiffModelFactory() //
       .withLocalSourceEndpoint("c:/temp/") //
       .withRemoteTargetEndpoint("Dropbox:/backup").create();
