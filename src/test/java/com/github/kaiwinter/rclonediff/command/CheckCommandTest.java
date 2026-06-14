@@ -57,7 +57,7 @@ class CheckCommandTest {
       .withRemoteTargetEndpoint("Dropbox:/backup").create();
 
     CheckCommand checkCommand = new CheckCommand(model);
-    assertEquals("check \"c:/temp/\" \"Dropbox:/backup/\"", checkCommand.getCommandline());
+    assertArrayEquals(new String[] { "check", "c:/temp/", "Dropbox:/backup/" }, checkCommand.getCommandline());
   }
 
   /**

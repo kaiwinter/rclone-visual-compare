@@ -21,7 +21,7 @@ public class MainApplication extends Application {
   @Override
   public void start(Stage primaryStage) throws IOException {
     FXMLLoader loader = new FXMLLoader();
-    AnchorPane page = (AnchorPane) loader.load(getClass().getResourceAsStream("/RcloneCompareView.fxml"));
+    AnchorPane page = loader.load(getClass().getResourceAsStream("/RcloneCompareView.fxml"));
     Scene scene = new Scene(page);
     view = loader.getController();
 
@@ -31,7 +31,7 @@ public class MainApplication extends Application {
   }
 
   @Override
-  public void stop() throws Exception {
+  public void stop() {
     view.deleteTempDirectory();
   }
 }

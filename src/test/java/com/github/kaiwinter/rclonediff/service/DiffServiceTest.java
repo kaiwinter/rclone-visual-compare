@@ -2,9 +2,7 @@ package com.github.kaiwinter.rclonediff.service;
 
 import static com.github.kaiwinter.rclonediff.util.TestFactories.SyncEndpointFactory.createLocalEndpoint;
 import static com.github.kaiwinter.rclonediff.util.TestFactories.SyncEndpointFactory.createRemoteEndpoint;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
@@ -54,7 +52,7 @@ class DiffServiceTest {
     new RcloneCompareService(serviceFactory).deleteSourceFile(model);
 
     assertEquals(0, model.getSourceOnly().size());
-    assertEquals("delete \"source/file\"", serviceFactory.lastCommand.getCommandline());
+    assertArrayEquals(new String[] { "delete", "source/file" }, serviceFactory.lastCommand.getCommandline());
   }
 
   @Test
@@ -83,7 +81,7 @@ class DiffServiceTest {
     new RcloneCompareService(serviceFactory).deleteTargetFile(model);
 
     assertEquals(0, model.getTargetOnly().size());
-    assertEquals("delete \"target/file\"", serviceFactory.lastCommand.getCommandline());
+    assertArrayEquals(new String[] { "delete", "target/file" }, serviceFactory.lastCommand.getCommandline());
   }
 
   @Test
@@ -97,7 +95,7 @@ class DiffServiceTest {
     new RcloneCompareService(serviceFactory).copyToTarget(model);
 
     assertEquals(0, model.getSourceOnly().size());
-    assertEquals("copy \"source/file\" \"target/\"", serviceFactory.lastCommand.getCommandline());
+    assertArrayEquals(new String[] { "copy", "source/file", "target" }, serviceFactory.lastCommand.getCommandline());
   }
 
   @Test
@@ -124,7 +122,7 @@ class DiffServiceTest {
     new RcloneCompareService(serviceFactory).copyToSource(model);
 
     assertEquals(0, model.getTargetOnly().size());
-    assertEquals("copy \"target/file\" \"source/\"", serviceFactory.lastCommand.getCommandline());
+    assertArrayEquals(new String[] { "copy", "target/file", "source" }, serviceFactory.lastCommand.getCommandline());
   }
 
   @Test
@@ -138,7 +136,7 @@ class DiffServiceTest {
     new RcloneCompareService(serviceFactory).copyToTargetFromDiff(model);
 
     assertEquals(0, model.getContentDifferent().size());
-    assertEquals("copy \"source/file\" \"target/\"", serviceFactory.lastCommand.getCommandline());
+    assertArrayEquals(new String[] { "copy", "source/file", "target" }, serviceFactory.lastCommand.getCommandline());
   }
 
   @Test
@@ -152,7 +150,7 @@ class DiffServiceTest {
     new RcloneCompareService(serviceFactory).copyToSourceFromDiff(model);
 
     assertEquals(0, model.getContentDifferent().size());
-    assertEquals("copy \"target/file\" \"source/\"", serviceFactory.lastCommand.getCommandline());
+    assertArrayEquals(new String[] {"copy", "target/file", "source" }, serviceFactory.lastCommand.getCommandline());
   }
 
   @Test
@@ -195,9 +193,9 @@ class DiffServiceTest {
       assertNotNull(model.getSourceImage());
       assertNull(model.getTargetImage());
 
-      String expectedCommandLine = "copy \"Remotename:/image.png\" \"" + tempDirectory.toString() + "/\"";
-      String actualCommandLine = model.getLatestCopyCommand().getCommandline();
-      assertEquals(expectedCommandLine, actualCommandLine);
+      String[] expectedCommandLine = { "copy", "Remotename:/image.png", tempDirectory.toString()};
+      String[] actualCommandLine = model.getLatestCopyCommand().getCommandline();
+      assertArrayEquals(expectedCommandLine, actualCommandLine);
     } finally {
       diffService.deleteTempDirectory();
     }
@@ -215,9 +213,9 @@ class DiffServiceTest {
       assertNull(model.getSourceImage());
       assertNotNull(model.getTargetImage());
 
-      String expectedCommandLine = "copy \"Remotename:/image.png\" \"" + tempDirectory.toString() + "/\"";
-      String actualCommandLine = model.getLatestCopyCommand().getCommandline();
-      assertEquals(expectedCommandLine, actualCommandLine);
+      String[] expectedCommandLine = { "copy", "Remotename:/image.png", tempDirectory.toString()};
+      String[] actualCommandLine = model.getLatestCopyCommand().getCommandline();
+      assertArrayEquals(expectedCommandLine, actualCommandLine);
     } finally {
       diffService.deleteTempDirectory();
     }

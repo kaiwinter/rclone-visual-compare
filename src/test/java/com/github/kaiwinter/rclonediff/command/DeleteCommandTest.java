@@ -1,7 +1,6 @@
 package com.github.kaiwinter.rclonediff.command;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 
@@ -18,7 +17,7 @@ class DeleteCommandTest {
   @Test
   void valid_command() throws IOException {
     DeleteCommand deleteCommand = new DeleteCommand("Dropbox:/backup/file1");
-    assertEquals("delete \"Dropbox:/backup/file1\"", deleteCommand.getCommandline());
+    assertArrayEquals(new String[] { "delete", "Dropbox:/backup/file1" }, deleteCommand.getCommandline());
   }
 
   @Test

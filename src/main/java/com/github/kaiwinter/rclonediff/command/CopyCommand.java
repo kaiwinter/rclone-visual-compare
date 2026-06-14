@@ -1,7 +1,5 @@
 package com.github.kaiwinter.rclonediff.command;
 
-import static com.github.kaiwinter.rclonediff.util.StringUtils.wrapInQuotes;
-
 import com.github.kaiwinter.rclonediff.model.SyncFile;
 
 import lombok.RequiredArgsConstructor;
@@ -20,13 +18,14 @@ public class CopyCommand extends AbstractCommand {
   }
 
   @Override
-  public String getCommandline() {
+  public String[] getCommandline() {
     String file = syncFile.getFile();
     String fromPath = syncFile.getSourceEndpoint().getPath();
     String toPath = syncFile.getTargetEndpoint().getPath();
     String targetDirectory = toPath + file;
-    targetDirectory = targetDirectory.substring(0, targetDirectory.lastIndexOf("/") + 1);
-    return "copy " + wrapInQuotes(fromPath + file) + " " + wrapInQuotes(targetDirectory);
+    targetDirectory = targetDirectory.substring(0, targetDirectory.lastIndexOf("/"));
+
+    return new String[] {"copy", fromPath + file, targetDirectory};
   }
 
   @Override

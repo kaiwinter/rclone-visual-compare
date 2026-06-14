@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.github.kaiwinter.rclonediff.util.AlertDialogBuilder;
 
@@ -76,12 +77,14 @@ public class RcloneCommandlineService extends Service<Void> {
   }
 
   private void executeCommand() throws IOException {
-    String commandline = String.join(" ", rcloneBinaryPath, command.getCommandline());
+    String[] commandline = Stream.concat(Stream.of(rcloneBinaryPath), Arrays.stream(command.getCommandline()))
+            .toArray(String[]::new);
 
-    log.info("Command: {}", commandline);
-    consoleLog.add(commandline);
+    var processBuilder = new ProcessBuilder(commandline);
 
-    process = runtime.exec(commandline);
+    log.info("Command: {}", processBuilder.command());
+    consoleLog.add(processBuilder.command().toString());
+    process = new ProcessBuilder(commandline).start();
     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
     String line;

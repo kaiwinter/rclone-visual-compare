@@ -1,7 +1,5 @@
 package com.github.kaiwinter.rclonediff.command;
 
-import static com.github.kaiwinter.rclonediff.util.StringUtils.wrapInQuotes;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -18,8 +16,8 @@ public class DeleteCommand extends AbstractCommand {
   }
 
   @Override
-  public String getCommandline() {
-    return "delete " + wrapInQuotes(absoluteFilename);
+  public String[] getCommandline() {
+    return new String[] {"delete", absoluteFilename};
   }
 
   @Override

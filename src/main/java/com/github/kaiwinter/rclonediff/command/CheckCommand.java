@@ -1,7 +1,5 @@
 package com.github.kaiwinter.rclonediff.command;
 
-import static com.github.kaiwinter.rclonediff.util.StringUtils.wrapInQuotes;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,8 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 public class CheckCommand extends AbstractCommand {
 
   private static final Pattern SIZES_DIFFER = Pattern.compile(".*ERROR : (.*): Sizes differ", Pattern.CASE_INSENSITIVE);
-  private static final String NOT_IN_LOCAL = ".*ERROR : (.*): File not in Local file system at \\/\\/\\?\\/{0}";
-  private static final String NOT_IN_REMOTE = ".*ERROR : (.*): File not in .*'{0}'";
+  private static final String NOT_IN_LOCAL = ".*ERROR : (.*): file not in Local file system at (.*)";
+  private static final String NOT_IN_REMOTE = ".*ERROR : (.*): file not in .*'{0}'";
 
   private final RcloneCompareViewModel model;
 
@@ -59,17 +57,18 @@ public class CheckCommand extends AbstractCommand {
 
   @Override
   public int[] getExpectedReturnCodes() {
-    return new int[] {0, // source and target equal
-        1 // source and target not equal
+    return new int[] {
+            0, // source and target equal
+            1 // source and target not equal
     };
   }
 
   @Override
-  public String getCommandline() {
+  public String[] getCommandline() {
     SyncEndpoint source = model.getSource().getValue();
     SyncEndpoint target = model.getTarget().getValue();
 
-    return "check " + wrapInQuotes(source.getPath()) + " " + wrapInQuotes(target.getPath());
+    return new String[] {"check", source.getPath(), target.getPath()};
   }
 
   @Override
